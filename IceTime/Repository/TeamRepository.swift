@@ -52,6 +52,7 @@ enum RepositoryError: LocalizedError {
     case iCloudUnavailable
     case malformedRecord(String)
     case teamNotFound
+    case notImplemented(String)
     
     var errorDescription: String? {
         switch self {
@@ -61,6 +62,8 @@ enum RepositoryError: LocalizedError {
             return "Unexpected data from server: \(detail)"
         case .teamNotFound:
             return "This team could not be found."
+        case .notImplemented(let feature):
+            return "\(feature) is not implemented yet."
         }
     }
 }

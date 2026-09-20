@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct IceTimeApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TeamsListView()
         }
     }
 }

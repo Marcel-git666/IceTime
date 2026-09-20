@@ -74,4 +74,8 @@ final class CloudKitTeamRepository: TeamRepository {
     func cacheZone(_ zoneID: CKRecordZone.ID, forTeamID teamID: String) {
         zoneCache[teamID] = zoneID
     }
+    
+    func clearCachedZone(forTeamID teamID: String) {
+        zoneCache[teamID] = nil
+    }
 }

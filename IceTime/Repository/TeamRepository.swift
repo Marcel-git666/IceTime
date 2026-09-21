@@ -35,6 +35,7 @@ protocol TeamRepository {
     
     func createEvent(_ event: Event, in team: Team) async throws
     func fetchEvents(for team: Team) async throws -> [Event]
+    func updateEvent(_ event: Event, in team: Team) async throws
     
     // MARK: RSVPs
     

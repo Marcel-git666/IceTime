@@ -25,6 +25,12 @@ final class CloudKitTeamRepository: TeamRepository {
         let database: CKDatabase
     }
     
+    enum RecordType {
+        static let teamInfo = "TeamInfo"
+        static let player = "Player"
+        static let event = "Event"
+    }
+    
     private var zoneCache: [String: CKRecordZone.ID] = [:]
     
     func resolve(_ team: Team) async throws -> ResolvedZone {
@@ -77,5 +83,37 @@ final class CloudKitTeamRepository: TeamRepository {
     
     func clearCachedZone(forTeamID teamID: String) {
         zoneCache[teamID] = nil
+    }
+    
+    func fetchAllRecords(recordType: String, in team: Team) async throws -> [CKRecord] {
+        let resolved = try await resolve(team)
+        let query = CKQuery(recordType: recordType, predicate: NSPredicate(value: true))
+        
+        var out: [CKRecord] = []
+        var cursor: CKQueryOperation.Cursor?
+        
+        do {
+            repeat {
+                let page: (matchResults: [(CKRecord.ID, Result<CKRecord, Error>)],
+                           queryCursor: CKQueryOperation.Cursor?)
+                if let cursor {
+                    page = try await resolved.database.records(continuingMatchFrom: cursor)
+                } else {
+                    page = try await resolved.database.records(
+                        matching: query,
+                        inZoneWith: resolved.zoneID,
+                        desiredKeys: nil,
+                        resultsLimit: CKQueryOperation.maximumResults
+                    )
+                }
+                for (_, result) in page.matchResults {
+                    if let record = try? result.get() { out.append(record) }
+                }
+                cursor = page.queryCursor
+            } while cursor != nil
+        } catch let error as CKError where error.code == .unknownItem {
+            return []
+        }
+        return out
     }
 }

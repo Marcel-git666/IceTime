@@ -29,7 +29,7 @@ extension CloudKitTeamRepository {
     }
     
     private func teamName(for zoneID: CKRecordZone.ID, in database: CKDatabase) async throws -> String {
-        let recordID = CKRecord.ID(recordName: "TeamInfo", zoneID: zoneID)
+        let recordID = CKRecord.ID(recordName: RecordType.teamInfo, zoneID: zoneID)
         if let record = try? await database.record(for: recordID), let name = record["name"] as? String {
             return name
         }
@@ -45,8 +45,8 @@ extension CloudKitTeamRepository {
         cacheZone(zone.zoneID, forTeamID: zoneName)
         
         let infoRecord = CKRecord(
-            recordType: "TeamInfo",
-            recordID: CKRecord.ID(recordName: "TeamInfo", zoneID: zone.zoneID)
+            recordType: RecordType.teamInfo,
+            recordID: CKRecord.ID(recordName: RecordType.teamInfo, zoneID: zone.zoneID)
         )
         infoRecord["name"] = name
         _ = try await container.privateCloudDatabase.save(infoRecord)

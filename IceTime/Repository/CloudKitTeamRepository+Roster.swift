@@ -10,7 +10,7 @@ import CloudKit
 
 extension CloudKitTeamRepository {
     func fetchRoster(for team: Team) async throws -> [Player] {
-        let records = try await fetchAllRecords(recordType: "Player", in: team)
+        let records = try await fetchAllRecords(recordType: RecordType.player, in: team)
         return records.compactMap { try? player(from: $0) }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
@@ -23,7 +23,7 @@ extension CloudKitTeamRepository {
         do {
             record = try await resolved.database.record(for: recordID)
         } catch let error as CKError where error.code == .unknownItem {
-            record = CKRecord(recordType: "Player", recordID: recordID)
+            record = CKRecord(recordType: RecordType.player, recordID: recordID)
         }
         
         record["name"] = player.name
@@ -46,37 +46,5 @@ extension CloudKitTeamRepository {
             isGoalie: goalie != 0,
             userRecordID: record["userRecordID"] as? String
         )
-    }
-    
-    private func fetchAllRecords(recordType: String, in team: Team) async throws -> [CKRecord] {
-        let resolved = try await resolve(team)
-        let query = CKQuery(recordType: recordType, predicate: NSPredicate(value: true))
-        
-        var out: [CKRecord] = []
-        var cursor: CKQueryOperation.Cursor?
-        
-        do {
-            repeat {
-                let page: (matchResults: [(CKRecord.ID, Result<CKRecord, Error>)],
-                           queryCursor: CKQueryOperation.Cursor?)
-                if let cursor {
-                    page = try await resolved.database.records(continuingMatchFrom: cursor)
-                } else {
-                    page = try await resolved.database.records(
-                        matching: query,
-                        inZoneWith: resolved.zoneID,
-                        desiredKeys: nil,
-                        resultsLimit: CKQueryOperation.maximumResults
-                    )
-                }
-                for (_, result) in page.matchResults {
-                    if let record = try? result.get() { out.append(record) }
-                }
-                cursor = page.queryCursor
-            } while cursor != nil
-        } catch let error as CKError where error.code == .unknownItem {
-            return []
-        }
-        return out
     }
 }

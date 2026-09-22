@@ -12,6 +12,7 @@ struct TeamsListView: View {
     @State private var viewModel = TeamsViewModel()
     @State private var isShowingNewTeamAlert = false
     @State private var newTeamName = ""
+    @State private var isPresentingProfile = false
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
@@ -58,6 +59,13 @@ struct TeamsListView: View {
                     }
                     .disabled(viewModel.isBusy)
                 }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isPresentingProfile = true
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                    }
+                }
             }
             .overlay {
                 if viewModel.isBusy && viewModel.teams.isEmpty {
@@ -83,6 +91,9 @@ struct TeamsListView: View {
                 Button("OK") { viewModel.errorMessage = nil }
             } message: {
                 Text(viewModel.errorMessage ?? "")
+            }
+            .sheet(isPresented: $isPresentingProfile) {
+                ProfileView()
             }
         }
     }

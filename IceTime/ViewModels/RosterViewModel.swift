@@ -5,14 +5,13 @@
 //  Created by Marcel Mravec on 20.09.2026.
 //
 
-
-import Foundation
-import Observation
+import SwiftUI
 
 @Observable
 final class RosterViewModel {
     private(set) var players: [Player] = []
     private(set) var isBusy = false
+    private(set) var currentUserRecordID: String?
     var errorMessage: String?
     
     private let repository: TeamRepository
@@ -21,11 +20,17 @@ final class RosterViewModel {
         self.repository = repository
     }
     
+    var isCurrentUserOnRoster: Bool {
+        guard let currentUserRecordID else { return false }
+        return players.contains { $0.userRecordID == currentUserRecordID }
+    }
+    
     func load(for team: Team) async {
         isBusy = true
         defer { isBusy = false }
         do {
             players = try await repository.fetchRoster(for: team)
+            currentUserRecordID = try await repository.currentUserRecordID()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -44,4 +49,39 @@ final class RosterViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    func addMyself(to team: Team) async {
+        guard !isBusy, !isCurrentUserOnRoster else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let userRecordID = try await repository.currentUserRecordID()
+            let profile = try await repository.fetchProfile()
+            let name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
+            let player = Player(name: name, isGoalie: profile?.isGoalie ?? false, userRecordID: userRecordID, phone: profile?.phone, email: profile?.email)
+            try await repository.addPlayerToRoster(player, to: team)
+            players.append(player)
+            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func syncMyInfo(to team: Team) async {
+          guard !isBusy, let currentUserRecordID, let index = players.firstIndex(where: { $0.userRecordID == currentUserRecordID }) else { return }
+          isBusy = true
+          defer { isBusy = false }
+          do {
+              let profile = try await repository.fetchProfile()
+              var player = players[index]
+              player.name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
+              player.isGoalie = profile?.isGoalie ?? false
+              player.phone = profile?.phone
+              player.email = profile?.email
+              try await repository.addPlayerToRoster(player, to: team)
+              players[index] = player
+              players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+          } catch {
+              errorMessage = error.localizedDescription
+          }
+      }
 }

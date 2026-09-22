@@ -127,16 +127,39 @@ struct TeamDetailView: View {
     @ViewBuilder
     private var rosterSection: some View {
         Section("Roster") {
+            if !rosterViewModel.isCurrentUserOnRoster {
+                Button {
+                    Task { await rosterViewModel.addMyself(to: team) }
+                } label: {
+                    Label("Add myself", systemImage: "person.fill.badge.plus")
+                }
+            }
             ForEach(rosterViewModel.players) { player in
                 HStack {
                     Text(player.name)
+                    Spacer()
                     if player.isGoalie {
-                        Spacer()
                         Text("Goalie")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                    if player.userRecordID == rosterViewModel.currentUserRecordID {
+                        Button {
+                            Task { await rosterViewModel.syncMyInfo(to: team) }
+                        } label: {
+                            Label("Sync", systemImage: "arrow.clockwise")
+                                .font(.caption)
+                                .imageScale(.small)
+                        }
+                        .buttonStyle(.borderless)
+                        .tint(.blue)
+                    }
                 }
+                .listRowBackground(
+                    player.userRecordID == rosterViewModel.currentUserRecordID
+                    ? Color.yellow.opacity(0.3)
+                    : nil
+                )
             }
         }
     }

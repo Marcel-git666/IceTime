@@ -21,8 +21,7 @@ final class RosterViewModel {
     }
     
     var isCurrentUserOnRoster: Bool {
-        guard let currentUserRecordID else { return false }
-        return players.contains { $0.userRecordID == currentUserRecordID }
+        players.contains { isCurrentUser($0) }
     }
     
     func load(for team: Team) async {
@@ -67,21 +66,28 @@ final class RosterViewModel {
     }
     
     func syncMyInfo(to team: Team) async {
-          guard !isBusy, let currentUserRecordID, let index = players.firstIndex(where: { $0.userRecordID == currentUserRecordID }) else { return }
-          isBusy = true
-          defer { isBusy = false }
-          do {
-              let profile = try await repository.fetchProfile()
-              var player = players[index]
-              player.name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
-              player.isGoalie = profile?.isGoalie ?? false
-              player.phone = profile?.phone
-              player.email = profile?.email
-              try await repository.addPlayerToRoster(player, to: team)
-              players[index] = player
-              players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-          } catch {
-              errorMessage = error.localizedDescription
-          }
-      }
+        guard !isBusy, var player = players.first(where: { isCurrentUser($0) }) else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let profile = try await repository.fetchProfile()
+            player.name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
+            player.isGoalie = profile?.isGoalie ?? false
+            player.phone = profile?.phone
+            player.email = profile?.email
+            try await repository.addPlayerToRoster(player, to: team)
+            if let index = players.firstIndex(where: { $0.id == player.id }) {
+                players[index] = player
+            }
+            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    
+    func isCurrentUser(_ player: Player) -> Bool {
+        guard let currentUserRecordID else { return false }
+        return player.userRecordID == currentUserRecordID
+    }
 }

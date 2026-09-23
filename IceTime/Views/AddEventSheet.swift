@@ -46,9 +46,9 @@ struct AddEventSheet: View {
                         .pickerStyle(.segmented)
                         
                         if endChoice == .occurrenceCount {
-                            Stepper("\(occurrenceCount) times", value: $occurrenceCount, in: 2...52)
+                            Stepper("\(occurrenceCount) times", value: $occurrenceCount, in: 2...Recurrence.maxOccurrences)
                         } else {
-                            DatePicker("End date", selection: $endDate, displayedComponents: .date)
+                            DatePicker("End date", selection: $endDate, in: date..., displayedComponents: .date)
                         }
                     }
                 }

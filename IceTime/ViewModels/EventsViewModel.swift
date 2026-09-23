@@ -19,6 +19,8 @@ struct Recurrence {
     var frequency: RecurrenceFrequency
     var end: End
     
+    static let maxOccurrences = 52
+    
     enum End {
         case occurrenceCount(Int)
         case endDate(Date)
@@ -39,7 +41,10 @@ struct Recurrence {
                 current = next
             }
         case .endDate(let endDate):
-            while let next = calendar.date(byAdding: component, value: 1, to: current), next <= endDate {
+            // The picker selects a day; include every occurrence on that day
+            let startOfEndDay = calendar.startOfDay(for: endDate)
+            guard let dayAfterEnd = calendar.date(byAdding: .day, value: 1, to: startOfEndDay) else { break }
+            while dates.count < Self.maxOccurrences, let next = calendar.date(byAdding: component, value: 1, to: current), next < dayAfterEnd {
                 dates.append(next)
                 current = next
             }

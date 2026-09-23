@@ -5,13 +5,15 @@
 //  Created by Marcel Mravec on 20.09.2026.
 //
 
-import SwiftUI
+import Foundation
+import Observation
 
 @Observable
 final class RosterViewModel {
     private(set) var players: [Player] = []
     private(set) var isBusy = false
     private(set) var currentUserRecordID: String?
+    var needsProfile = false
     var errorMessage: String?
     
     private let repository: TeamRepository
@@ -54,9 +56,11 @@ final class RosterViewModel {
         defer { isBusy = false }
         do {
             let userRecordID = try await repository.currentUserRecordID()
-            let profile = try await repository.fetchProfile()
-            let name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
-            let player = Player(name: name, isGoalie: profile?.isGoalie ?? false, userRecordID: userRecordID, phone: profile?.phone, email: profile?.email)
+            guard let profile = try await repository.fetchProfile(), !profile.displayName.isEmpty else {
+                needsProfile = true
+                return
+            }
+            let player = Player(name: profile.displayName, isGoalie: profile.isGoalie, userRecordID: userRecordID, phone: profile.phone, email: profile.email)
             try await repository.addPlayerToRoster(player, to: team)
             players.append(player)
             players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
@@ -71,7 +75,9 @@ final class RosterViewModel {
         defer { isBusy = false }
         do {
             let profile = try await repository.fetchProfile()
-            player.name = (profile?.displayName.isEmpty == false) ? profile!.displayName : UIDevice.current.name
+            if let name = profile?.displayName, !name.isEmpty {
+                player.name = name
+            }
             player.isGoalie = profile?.isGoalie ?? false
             player.phone = profile?.phone
             player.email = profile?.email

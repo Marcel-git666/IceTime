@@ -28,7 +28,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
-        print("📥 willConnectTo")
         if let metadata = connectionOptions.cloudKitShareMetadata {
             acceptShare(metadata)
         }
@@ -39,7 +38,6 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         _ windowScene: UIWindowScene,
         userDidAcceptCloudKitShareWith cloudKitShareMetadata: CKShare.Metadata
     ) {
-        print("📥 userDidAccept")
         acceptShare(cloudKitShareMetadata)
     }
     

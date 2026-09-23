@@ -91,6 +91,9 @@ struct TeamDetailView: View {
                 }
             }
         }
+        .sheet(isPresented: $rosterViewModel.needsProfile) {
+            ProfileView(message: "Add your name so teammates know who you are.")
+        }
     }
     
     @ViewBuilder
@@ -173,7 +176,7 @@ struct TeamDetailView: View {
             }
         }
         .listRowBackground(
-            rosterViewModel.isCurrentUser(player) ? Color.yellow.opacity(0.3): nil
+            rosterViewModel.isCurrentUser(player) ? Color.yellow.opacity(0.3) : nil
         )
     }
     

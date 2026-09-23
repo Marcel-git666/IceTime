@@ -9,7 +9,7 @@
 import Foundation
 import Observation
 
-@Observable                           
+@Observable
 final class ProfileViewModel {
     private(set) var profile = Profile()
     private(set) var isBusy = false
@@ -31,7 +31,7 @@ final class ProfileViewModel {
         }
     }
     
-    func save(_ profile: Profile) async  -> Bool {
+    func save(_ profile: Profile) async -> Bool {
         guard !isBusy else { return false }
         isBusy = true
         defer { isBusy = false }

@@ -16,10 +16,17 @@ struct ProfileView: View {
     @State private var isGoalie = false
     @State private var phone = ""
     @State private var email = ""
+    var message: String? = nil
     
     var body: some View {
         NavigationStack {
             Form {
+                if let message {
+                    Section {
+                        Text(message)
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 TextField("First name", text: $firstName)
                 TextField("Last name", text: $lastName)
                 TextField("Phone", text: $phone)
@@ -46,6 +53,7 @@ struct ProfileView: View {
                             }
                         }
                     }
+                    .disabled(viewModel.isBusy)
                 }
             }
             .errorAlert($viewModel.errorMessage)

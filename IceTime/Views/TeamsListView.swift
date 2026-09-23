@@ -42,6 +42,9 @@ struct TeamsListView: View {
                     Task { await viewModel.load() }
                 }
             }
+            .onReceive(NotificationCenter.default.publisher(for: .teamShareAccepted)) { _ in
+                Task { await viewModel.load() }
+            }
             .refreshable {
                 await viewModel.load()
             }

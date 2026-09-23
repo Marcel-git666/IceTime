@@ -78,6 +78,12 @@ final class CloudKitTeamRepository: TeamRepository {
         }
     }
     
+    func requireOwner(_ team: Team) throws {
+        guard team.role == .owner else {
+            throw RepositoryError.notOwner
+        }
+    }
+    
     func cacheZone(_ zoneID: CKRecordZone.ID, forTeamID teamID: String) {
         zoneCache[teamID] = zoneID
     }

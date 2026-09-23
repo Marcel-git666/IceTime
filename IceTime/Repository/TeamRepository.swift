@@ -54,6 +54,7 @@ enum RepositoryError: LocalizedError {
     case malformedRecord(String)
     case teamNotFound
     case notImplemented(String)
+    case notOwner
     
     var errorDescription: String? {
         switch self {
@@ -65,6 +66,8 @@ enum RepositoryError: LocalizedError {
             return "This team could not be found."
         case .notImplemented(let feature):
             return "\(feature) is not implemented yet."
+        case .notOwner:
+            return "Only the team owner can do this."
         }
     }
 }

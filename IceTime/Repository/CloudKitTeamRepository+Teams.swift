@@ -60,9 +60,7 @@ extension CloudKitTeamRepository {
     }
     
     func shareTeam(_ team: Team) async throws -> CKShare {
-        guard team.role == .owner else {
-            throw RepositoryError.teamNotFound
-        }
+        try requireOwner(team)
         let resolved = try await resolve(team)
         
         let shareRecordID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: resolved.zoneID)

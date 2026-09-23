@@ -10,6 +10,7 @@ import CloudKit
 
 extension CloudKitTeamRepository {
     func createEvent(_ event: Event, in team: Team) async throws {
+        try requireOwner(team)
         let resolved = try await resolve(team)
         let record = CKRecord(
             recordType: RecordType.event,
@@ -27,9 +28,7 @@ extension CloudKitTeamRepository {
     }
     
     func updateEvent(_ event: Event, in team: Team) async throws {
-        guard team.role == .owner else {
-            throw RepositoryError.teamNotFound
-        }
+        try requireOwner(team)
         let resolved = try await resolve(team)
         let recordID = CKRecord.ID(recordName: event.id.uuidString, zoneID: resolved.zoneID)
         let record = try await resolved.database.record(for: recordID)

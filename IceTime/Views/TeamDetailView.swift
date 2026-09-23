@@ -28,18 +28,19 @@ struct TeamDetailView: View {
         }
         .navigationTitle(team.name)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    isPresentingAddPlayer = true
-                } label: {
-                    Image(systemName: "person.badge.plus")
+            if team.role == .owner {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isPresentingAddPlayer = true
+                    } label: {
+                        Image(systemName: "person.badge.plus")
+                    }
                 }
-            }
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    isPresentingAddEvent = true
-                } label: {
-                    Image(systemName: "calendar.badge.plus")
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button { isPresentingAddEvent = true } label: {
+                        Image(systemName: "calendar.badge.plus")
+                    }
                 }
             }
         }

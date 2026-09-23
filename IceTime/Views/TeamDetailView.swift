@@ -135,33 +135,59 @@ struct TeamDetailView: View {
                 }
             }
             ForEach(rosterViewModel.players) { player in
-                HStack {
-                    Text(player.name)
-                    Spacer()
-                    if player.isGoalie {
-                        Text("Goalie")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    if player.userRecordID == rosterViewModel.currentUserRecordID {
-                        Button {
-                            Task { await rosterViewModel.syncMyInfo(to: team) }
-                        } label: {
-                            Label("Sync", systemImage: "arrow.clockwise")
-                                .font(.caption)
-                                .imageScale(.small)
+                playerRow(player)
+                    .contextMenu {
+                        if let phone = player.phone, let url = URL(string: "tel:\(phone)") {
+                            Link("Call \(phone)", destination: url)
                         }
-                        .buttonStyle(.borderless)
-                        .tint(.blue)
+                        if let email = player.email, let url = URL(string: "mailto:\(email)") {
+                            Link("Email \(email)", destination: url)
+                        }
                     }
-                }
-                .listRowBackground(
-                    player.userRecordID == rosterViewModel.currentUserRecordID
-                    ? Color.yellow.opacity(0.3)
-                    : nil
-                )
             }
         }
+    }
+    
+    @ViewBuilder
+    private func playerRow(_ player: Player) -> some View {
+        HStack {
+            Text(player.name)
+            Spacer()
+            if player.isGoalie {
+                Text("Goalie")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if !rosterViewModel.isCurrentUser(player) {
+                if let phone = player.phone,
+                   let url = URL(string: "tel:\(phone.filter { !$0.isWhitespace })") {
+                    Link(destination: url) {
+                        Image(systemName: "phone.fill")
+                    }
+                    .buttonStyle(.borderless)
+                }
+                if let email = player.email, let url = URL(string: "mailto:\(email)") {
+                    Link(destination: url) {
+                        Image(systemName: "envelope.fill")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+            if rosterViewModel.isCurrentUser(player) {
+                Button {
+                    Task { await rosterViewModel.syncMyInfo(to: team) }
+                } label: {
+                    Label("Sync", systemImage: "arrow.clockwise")
+                        .font(.caption)
+                        .imageScale(.small)
+                }
+                .buttonStyle(.borderless)
+                .tint(.blue)
+            }
+        }
+        .listRowBackground(
+            rosterViewModel.isCurrentUser(player) ? Color.yellow.opacity(0.3): nil
+        )
     }
     
     @ViewBuilder

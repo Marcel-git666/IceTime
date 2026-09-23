@@ -29,6 +29,8 @@ extension CloudKitTeamRepository {
         record["name"] = player.name
         record["isGoalie"] = player.isGoalie ? 1 : 0
         record["userRecordID"] = player.userRecordID
+        record["phone"] = player.phone
+        record["email"] = player.email
         _ = try await resolved.database.save(record)
     }
     
@@ -44,7 +46,9 @@ extension CloudKitTeamRepository {
             id: uuid,
             name: name,
             isGoalie: goalie != 0,
-            userRecordID: record["userRecordID"] as? String
+            userRecordID: record["userRecordID"] as? String,
+            phone: record["phone"] as? String,
+            email: record["email"] as? String,
         )
     }
 }

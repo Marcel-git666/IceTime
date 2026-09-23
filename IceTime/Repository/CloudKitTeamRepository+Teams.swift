@@ -18,12 +18,12 @@ extension CloudKitTeamRepository {
             let name = try await teamName(for: zone.zoneID, in: container.privateCloudDatabase)
             teams.append(Team(id: zone.zoneID.zoneName, name: name, role: .owner))
         }
-
+        
         for zone in try await teamZones(in: container.sharedCloudDatabase) {
-              cacheZone(zone.zoneID, forTeamID: zone.zoneID.zoneName)
-              let name = try await teamName(for: zone.zoneID, in: container.sharedCloudDatabase)
-              teams.append(Team(id: zone.zoneID.zoneName, name: name, role: .participant))
-          }
+            cacheZone(zone.zoneID, forTeamID: zone.zoneID.zoneName)
+            let name = try await teamName(for: zone.zoneID, in: container.sharedCloudDatabase)
+            teams.append(Team(id: zone.zoneID.zoneName, name: name, role: .participant))
+        }
         
         return teams
     }
@@ -66,10 +66,13 @@ extension CloudKitTeamRepository {
         let resolved = try await resolve(team)
         
         let shareRecordID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: resolved.zoneID)
-        if let existing = try? await resolved.database.record(for: shareRecordID) as? CKShare {
-            return existing
+        do {
+            if let existing = try await resolved.database.record(for: shareRecordID) as? CKShare {
+                return existing
+            }
+        } catch let error as CKError where error.code == .unknownItem {
+            // No share yet; create one below
         }
-        
         let share = CKShare(recordZoneID: resolved.zoneID)
         share[CKShare.SystemFieldKey.title] = team.name
         guard let saved = try await resolved.database.save(share) as? CKShare else {

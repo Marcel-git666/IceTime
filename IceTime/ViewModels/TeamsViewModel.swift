@@ -27,7 +27,7 @@ final class TeamsViewModel {
         do {
             teams = try await repository.fetchTeams()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -39,7 +39,7 @@ final class TeamsViewModel {
             let team = try await repository.createTeam(name: name)
             teams.append(team)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -51,7 +51,7 @@ final class TeamsViewModel {
             try await repository.deleteTeam(team)
             teams.removeAll { $0.id == team.id }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

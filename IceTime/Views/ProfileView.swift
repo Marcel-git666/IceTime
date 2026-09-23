@@ -27,6 +27,7 @@ struct ProfileView: View {
                 Toggle("Goalie", isOn: $isGoalie)
             }
             .navigationTitle("My Profile")
+            .disabled(viewModel.isBusy)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -34,18 +35,20 @@ struct ProfileView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         Task {
-                            await viewModel.save(Profile(
+                            if await viewModel.save(Profile(
                                 firstName: firstName,
                                 lastName: lastName,
                                 isGoalie: isGoalie,
                                 phone: phone.isEmpty ? nil : phone,
                                 email: email.isEmpty ? nil : email
-                            ))
-                            dismiss()
+                            )) {
+                                dismiss()
+                            }
                         }
                     }
                 }
             }
+            .errorAlert($viewModel.errorMessage)
             .task {
                 await viewModel.load()
                 firstName = viewModel.profile.firstName

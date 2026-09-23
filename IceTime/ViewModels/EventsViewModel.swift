@@ -71,7 +71,7 @@ final class EventsViewModel {
         do {
             events = try await repository.fetchEvents(for: team)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -87,7 +87,7 @@ final class EventsViewModel {
             }
             events.sort { $0.date < $1.date }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -99,7 +99,7 @@ final class EventsViewModel {
             try await repository.deleteEvent(event, in: team)
             events.removeAll { $0.id == event.id }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -114,7 +114,7 @@ final class EventsViewModel {
             }
             events.sort { $0.date < $1.date }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
 }

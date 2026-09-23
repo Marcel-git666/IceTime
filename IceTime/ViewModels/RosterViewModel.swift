@@ -31,7 +31,7 @@ final class RosterViewModel {
             players = try await repository.fetchRoster(for: team)
             currentUserRecordID = try await repository.currentUserRecordID()
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -45,7 +45,7 @@ final class RosterViewModel {
             players.append(player)
             players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     func addMyself(to team: Team) async {
@@ -61,7 +61,7 @@ final class RosterViewModel {
             players.append(player)
             players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     
@@ -81,7 +81,7 @@ final class RosterViewModel {
             }
             players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.userMessage
         }
     }
     

@@ -43,22 +43,9 @@ struct TeamDetailView: View {
                 }
             }
         }
-        .alert("Error", isPresented: Binding(
-            get: { rosterViewModel.errorMessage != nil },
-            set: { if !$0 { rosterViewModel.errorMessage = nil } }
-        )) {
-            Button("OK") { rosterViewModel.errorMessage = nil }
-        } message: {
-            Text(rosterViewModel.errorMessage ?? "")
-        }
-        .alert("Error", isPresented: Binding(
-            get: { eventsViewModel.errorMessage != nil },
-            set: { if !$0 { eventsViewModel.errorMessage = nil } }
-        )) {
-            Button("OK") { eventsViewModel.errorMessage = nil }
-        } message: {
-            Text(eventsViewModel.errorMessage ?? "")
-        }
+        .errorAlert($rosterViewModel.errorMessage)
+        .errorAlert($eventsViewModel.errorMessage)
+        .errorAlert($detailViewModel.errorMessage)
         .task {
             await rosterViewModel.load(for: team)
             await eventsViewModel.load(for: team)

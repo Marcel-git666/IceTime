@@ -22,11 +22,12 @@ struct Event: Identifiable, Codable, Hashable {
         date: Date,
         location: String,
         goalieLimit: Int = Event.defaultGoalieLimit,
-        skaterLimit: Int = Event.defaultSkaterLimit) {
-            self.id = id
-            self.date = date
-            self.location = location
-            self.goalieLimit = goalieLimit
-            self.skaterLimit = skaterLimit
-        }
+        skaterLimit: Int = Event.defaultSkaterLimit
+    ) {
+        self.id = id
+        self.date = date
+        self.location = location
+        self.goalieLimit = goalieLimit
+        self.skaterLimit = skaterLimit
+    }
 }

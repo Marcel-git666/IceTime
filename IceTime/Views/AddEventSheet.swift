@@ -20,7 +20,6 @@ struct AddEventSheet: View {
     @State private var skaterLimit = Event.defaultSkaterLimit
     let onAdd: (Event, Recurrence) -> Void
     
-    
     enum EndChoice: Hashable {
         case occurrenceCount
         case endDate

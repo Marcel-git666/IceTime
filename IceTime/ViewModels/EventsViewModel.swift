@@ -56,6 +56,7 @@ struct Recurrence {
 @Observable
 final class EventsViewModel {
     private(set) var events: [Event] = []
+    private var rsvps: [RSVP] = []
     private(set) var isBusy = false
     var errorMessage: String?
     
@@ -69,7 +70,10 @@ final class EventsViewModel {
         isBusy = true
         defer { isBusy = false }
         do {
-            events = try await repository.fetchEvents(for: team)
+            async let fetchedEvents = repository.fetchEvents(for: team)
+            async let fetchedRSVPs = repository.fetchRSVPs(for: team)
+            events = try await fetchedEvents
+            rsvps = try await fetchedRSVPs
         } catch {
             errorMessage = error.userMessage
         }
@@ -121,5 +125,53 @@ final class EventsViewModel {
         } catch {
             errorMessage = error.userMessage
         }
+    }
+    
+    func rsvp(of player: Player, for event: Event) -> RSVP? {
+        rsvps.first { $0.eventID == event.id && $0.playerID == player.id }
+    }
+    
+    func setRSVP(_ status: RSVPStatus, for player: Player, event: Event, in team: Team) async {
+        // Re-sending the same answer would bump modificationDate and move the player to the back of the queue
+        guard rsvp(of: player, for: event)?.status != status else { return }
+        
+        let previous = rsvps
+        let rsvp = RSVP(playerID: player.id, eventID: event.id, status: status)
+        rsvps.removeAll { $0.eventID == event.id && $0.playerID == player.id }
+        rsvps.append(rsvp)
+        do {
+            try await repository.submitRSVP(rsvp, in: team)
+        } catch {
+            rsvps = previous
+            errorMessage = error.userMessage
+        }
+    }
+    
+    func lineup(for event: Event, roster: [Player]) -> Lineup {
+        var lineup = Lineup()
+        var going: [(player: Player, respondedAt: Date)] = []
+        
+        for player in roster {
+            guard let rsvp = rsvp(of: player, for: event) else {
+                lineup.undecided.append(player)
+                continue
+            }
+            switch rsvp.status {
+            case .going: going.append((player, rsvp.respondedAt))
+            case .maybe: lineup.maybe.append(player)
+            case .notGoing: lineup.notGoing.append(player)
+            }
+        }
+        
+        // First come, first served; everyone over the limit is a substitute
+        let queue = going.sorted { $0.respondedAt < $1.respondedAt }.map(\.player)
+        let goalieQueue = queue.filter(\.isGoalie)
+        let skaterQueue = queue.filter { !$0.isGoalie }
+        
+        lineup.goalies = Array(goalieQueue.prefix(event.goalieLimit))
+        lineup.goalieSubs = Array(goalieQueue.dropFirst(event.goalieLimit))
+        lineup.skaters = Array(skaterQueue.prefix(event.skaterLimit))
+        lineup.skaterSubs = Array(skaterQueue.dropFirst(event.skaterLimit))
+        return lineup
     }
 }

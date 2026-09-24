@@ -21,6 +21,7 @@ extension CloudKitTeamRepository {
         
         // Fresh local record, not fetched: .changedKeys skips the change-tag check,
         // so this creates the record or overwrites the existing one (last write wins).
+        // respondedAt is not stored: the server's modificationDate is the source of truth for queue order
         let record = CKRecord(recordType: RecordType.rsvp, recordID: recordID)
         record["eventID"] = rsvp.eventID.uuidString
         record["playerID"] = rsvp.playerID.uuidString
@@ -43,10 +44,11 @@ extension CloudKitTeamRepository {
         guard
             let eventID = (record["eventID"] as? String).flatMap(UUID.init(uuidString:)),
             let playerID = (record["playerID"] as? String).flatMap(UUID.init(uuidString:)),
-            let status = (record["status"] as? String).flatMap(RSVPStatus.init(rawValue:))
+            let status = (record["status"] as? String).flatMap(RSVPStatus.init(rawValue:)),
+            let respondedAt = record.modificationDate
         else {
             throw RepositoryError.malformedRecord("RSVP \(record.recordID.recordName)")
         }
-        return RSVP(playerID: playerID, eventID: eventID, status: status)
+        return RSVP(playerID: playerID, eventID: eventID, status: status, respondedAt: respondedAt)
     }
 }

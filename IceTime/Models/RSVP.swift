@@ -11,6 +11,7 @@ struct RSVP: Codable, Hashable {
     let playerID: UUID
     let eventID: UUID
     var status: RSVPStatus
+    var respondedAt: Date = .now
 }
 
 enum RSVPStatus: String, Codable, CaseIterable, Hashable {

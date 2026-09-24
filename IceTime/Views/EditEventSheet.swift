@@ -12,6 +12,9 @@ struct EditEventSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var date: Date
     @State private var location: String
+    @State private var goalieLimit: Int
+    @State private var skaterLimit: Int
+    
     let event: Event
     let onSave: (Event) -> Void
     
@@ -20,13 +23,22 @@ struct EditEventSheet: View {
         self.onSave = onSave
         _date = State(initialValue: event.date)
         _location = State(initialValue: event.location)
+        _goalieLimit = State(initialValue: event.goalieLimit)
+        _skaterLimit = State(initialValue: event.skaterLimit)
     }
     
     var body: some View {
         NavigationStack {
             Form {
-                DatePicker("Date", selection: $date)
-                TextField("Location", text: $location)
+                Section {
+                    DatePicker("Date", selection: $date)
+                    TextField("Location", text: $location)
+                }
+                
+                Section("Lineup") {
+                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: 1...4)
+                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: 1...40)
+                }
             }
             .navigationTitle("Edit Event")
             .toolbar {
@@ -38,6 +50,8 @@ struct EditEventSheet: View {
                         var updated = event
                         updated.date = date
                         updated.location = location
+                        updated.goalieLimit = goalieLimit
+                        updated.skaterLimit = skaterLimit
                         onSave(updated)
                         dismiss()
                     }

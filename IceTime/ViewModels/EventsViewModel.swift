@@ -75,13 +75,18 @@ final class EventsViewModel {
         }
     }
     
-    func createEvents(startDate: Date, location: String, recurrence: Recurrence, to team: Team) async {
+    func createEvents(from template: Event, recurrence: Recurrence, to team: Team) async {
         guard !isBusy else { return }
         isBusy = true
         defer { isBusy = false }
         do {
-            for date in recurrence.occurrenceDates(startingAt: startDate) {
-                let event = Event(date: date, location: location)
+            for date in recurrence.occurrenceDates(startingAt: template.date) {
+                let event = Event(
+                    date: date,
+                    location: template.location,
+                    goalieLimit: template.goalieLimit,
+                    skaterLimit: template.skaterLimit
+                )
                 try await repository.createEvent(event, in: team)
                 events.append(event)
             }

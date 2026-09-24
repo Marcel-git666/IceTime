@@ -16,7 +16,10 @@ struct AddEventSheet: View {
     @State private var endChoice: EndChoice = .occurrenceCount
     @State private var occurrenceCount = 4
     @State private var endDate = Date().addingTimeInterval(60 * 60 * 24 * 30)
-    let onAdd: (Date, String, Recurrence) -> Void
+    @State private var goalieLimit = Event.defaultGoalieLimit
+    @State private var skaterLimit = Event.defaultSkaterLimit
+    let onAdd: (Event, Recurrence) -> Void
+    
     
     enum EndChoice: Hashable {
         case occurrenceCount
@@ -29,6 +32,11 @@ struct AddEventSheet: View {
                 Section {
                     DatePicker("Date", selection: $date)
                     TextField("Location", text: $location)
+                }
+                
+                Section("Lineup") {
+                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: 1...4)
+                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: 1...40)
                 }
                 
                 Section("Repeat") {
@@ -63,7 +71,8 @@ struct AddEventSheet: View {
                         let end: Recurrence.End = endChoice == .occurrenceCount
                         ? .occurrenceCount(occurrenceCount)
                         : .endDate(endDate)
-                        onAdd(date, location, Recurrence(frequency: frequency, end: end))
+                        let template = Event(date: date, location: location, goalieLimit: goalieLimit, skaterLimit: skaterLimit)
+                        onAdd(template, Recurrence(frequency: frequency, end: end))
                         dismiss()
                     }
                     .disabled(location.trimmingCharacters(in: .whitespaces).isEmpty)

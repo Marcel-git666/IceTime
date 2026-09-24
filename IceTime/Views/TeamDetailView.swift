@@ -79,9 +79,9 @@ struct TeamDetailView: View {
             }
         }
         .sheet(isPresented: $isPresentingAddEvent) {
-            AddEventSheet { date, location, recurrence in
+            AddEventSheet { template, recurrence in
                 Task {
-                    await eventsViewModel.createEvents(startDate: date, location: location, recurrence: recurrence, to: team)
+                    await eventsViewModel.createEvents(from: template, recurrence: recurrence, to: team)
                 }
             }
         }

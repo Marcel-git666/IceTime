@@ -18,6 +18,8 @@ extension CloudKitTeamRepository {
         )
         record["date"] = event.date
         record["location"] = event.location
+        record["goalieLimit"] = event.goalieLimit
+        record["skaterLimit"] = event.skaterLimit
         _ = try await resolved.database.save(record)
     }
     
@@ -34,6 +36,8 @@ extension CloudKitTeamRepository {
         let record = try await resolved.database.record(for: recordID)
         record["date"] = event.date
         record["location"] = event.location
+        record["goalieLimit"] = event.goalieLimit
+        record["skaterLimit"] = event.skaterLimit
         _ = try await resolved.database.save(record)
     }
     
@@ -45,6 +49,12 @@ extension CloudKitTeamRepository {
         else {
             throw RepositoryError.malformedRecord("Event \(record.recordID.recordName)")
         }
-        return Event(id: uuid, date: date, location: location)
+        return Event(
+            id: uuid,
+            date: date,
+            location: location,
+            goalieLimit: record["goalieLimit"] as? Int ?? Event.defaultGoalieLimit,
+            skaterLimit: record["skaterLimit"] as? Int ?? Event.defaultSkaterLimit
+        )
     }
 }

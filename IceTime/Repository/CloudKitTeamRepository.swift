@@ -30,6 +30,7 @@ final class CloudKitTeamRepository: TeamRepository {
         static let player = "Player"
         static let event = "Event"
         static let profile = "Profile"
+        static let rsvp = "RSVP"
     }
     
     private var zoneCache: [String: CKRecordZone.ID] = [:]

@@ -7,20 +7,10 @@
 
 import Foundation
 
-struct RSVP: Identifiable, Codable, Hashable {
-    let id: UUID
-    var playerID: UUID
-    var eventID: UUID
+struct RSVP: Codable, Hashable {
+    let playerID: UUID
+    let eventID: UUID
     var status: RSVPStatus
-    var timestamp: Date
-    
-    init(id: UUID = UUID(), playerID: UUID, eventID: UUID, status: RSVPStatus, timestamp: Date = .now) {
-        self.id = id
-        self.playerID = playerID
-        self.eventID = eventID
-        self.status = status
-        self.timestamp = timestamp
-    }
 }
 
 enum RSVPStatus: String, Codable, CaseIterable, Hashable {

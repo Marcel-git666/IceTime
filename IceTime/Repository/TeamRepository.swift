@@ -40,7 +40,7 @@ protocol TeamRepository {
     // MARK: RSVPs
     
     func submitRSVP(_ rsvp: RSVP, in team: Team) async throws
-    func fetchRSVPs(for eventID: UUID, in team: Team) async throws -> [RSVP]
+    func fetchRSVPs(for team: Team) async throws -> [RSVP]
     
     // MARK: Deletion
     
@@ -53,7 +53,6 @@ enum RepositoryError: LocalizedError {
     case iCloudUnavailable
     case malformedRecord(String)
     case teamNotFound
-    case notImplemented(String)
     case notOwner
     
     var errorDescription: String? {
@@ -64,8 +63,6 @@ enum RepositoryError: LocalizedError {
             return "Unexpected data from server: \(detail)"
         case .teamNotFound:
             return "This team could not be found."
-        case .notImplemented(let feature):
-            return "\(feature) is not implemented yet."
         case .notOwner:
             return "Only the team owner can do this."
         }

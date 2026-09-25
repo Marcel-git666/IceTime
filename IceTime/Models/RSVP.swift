@@ -17,13 +17,11 @@ struct RSVP: Codable, Hashable {
 enum RSVPStatus: String, Codable, CaseIterable, Hashable {
     case going
     case notGoing
-    case maybe
     
     var label: String {
         switch self {
         case .going: return "Going"
         case .notGoing: return "Not going"
-        case .maybe: return "Maybe"
         }
     }
 }

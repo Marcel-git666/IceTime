@@ -7,11 +7,10 @@
 
 
 struct Lineup {
-      var goalies: [Player] = []
-      var skaters: [Player] = []
-      var goalieSubs: [Player] = []
-      var skaterSubs: [Player] = []
-      var maybe: [Player] = []
-      var notGoing: [Player] = []
-      var undecided: [Player] = []
-  }
+    var goalies: [Player] = []
+    var skaters: [Player] = []
+    var goalieSubs: [Player] = []
+    var skaterSubs: [Player] = []
+    var notGoing: [Player] = []
+    var undecided: [Player] = []
+}

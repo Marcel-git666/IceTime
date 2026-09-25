@@ -158,7 +158,6 @@ final class EventsViewModel {
             }
             switch rsvp.status {
             case .going: going.append((player, rsvp.respondedAt))
-            case .maybe: lineup.maybe.append(player)
             case .notGoing: lineup.notGoing.append(player)
             }
         }

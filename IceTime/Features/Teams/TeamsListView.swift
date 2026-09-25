@@ -31,7 +31,7 @@ struct TeamsListView: View {
                     )
                 }
                 .listRowBackground(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: Design.cardCornerRadius)
                         .fill(colorStore.color(for: team).gradient)
                 )
                 .listRowSeparator(.hidden)
@@ -43,7 +43,7 @@ struct TeamsListView: View {
                     }
                 }
             }
-            .listRowSpacing(12)
+            .listRowSpacing(Design.cardSpacing)
             .navigationTitle("Teams")
             .navigationDestination(for: Team.self) { team in
                 TeamDetailView(team: team, color: colorStore.color(for: team))
@@ -102,7 +102,7 @@ struct TeamsListView: View {
                 TeamColorPicker(selected: colorStore.color(for: team)) { color in
                     colorStore.setColor(color, for: team)
                 }
-                .presentationDetents([.height(160)])
+                .presentationDetents([.height(TeamColorPicker.sheetHeight)])
             }
         }
     }

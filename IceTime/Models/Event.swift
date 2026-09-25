@@ -10,6 +10,8 @@ import Foundation
 struct Event: Identifiable, Codable, Hashable {
     static let defaultGoalieLimit = 2
     static let defaultSkaterLimit = 20
+    static let goalieLimitRange = 1...4
+    static let skaterLimitRange = 1...40
     
     let id: UUID
     var date: Date

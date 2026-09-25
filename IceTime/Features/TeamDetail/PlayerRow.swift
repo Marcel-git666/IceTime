@@ -48,6 +48,6 @@ struct PlayerRow: View {
                 EditIndicator()
             }
         }
-        .listRowBackground(isCurrentUser ? Color.yellow.opacity(0.3) : nil)
+        .listRowBackground(isCurrentUser ? Color.yellow.opacity(Design.currentUserHighlightOpacity) : nil)
     }
 }

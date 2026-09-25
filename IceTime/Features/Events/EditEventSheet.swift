@@ -37,8 +37,8 @@ struct EditEventSheet: View {
                 }
                 
                 Section("Lineup") {
-                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: 1...4)
-                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: 1...40)
+                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: Event.goalieLimitRange)
+                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: Event.skaterLimitRange)
                 }
             }
             .navigationTitle("Edit Event")

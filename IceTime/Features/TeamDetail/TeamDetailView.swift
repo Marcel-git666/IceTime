@@ -52,8 +52,7 @@ struct TeamDetailView: View {
                 }
             }
             .pickerStyle(.segmented)
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+            .padding([.horizontal, .bottom])
             .background(.bar)
         }
         .scrollContentBackground(.hidden)

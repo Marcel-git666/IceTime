@@ -9,23 +9,33 @@ import SwiftUI
 
 /// A row of color circles; tapping one picks it and closes the sheet.
 struct TeamColorPicker: View {
+    /// Height of the sheet this picker is shown in.
+    static let sheetHeight = 160.0
+    
+    private enum Layout {
+        static let spacing = 20.0
+        static let circleSpacing = 14.0
+        /// Apple's minimum tap target size.
+        static let circleSize = 44.0
+    }
+    
     let selected: TeamColor
     let onSelect: (TeamColor) -> Void
     
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Layout.spacing) {
             Text("Team Color")
                 .font(.headline)
-            HStack(spacing: 14) {
+            HStack(spacing: Layout.circleSpacing) {
                 ForEach(TeamColor.allCases) { color in
                     Button {
                         select(color)
                     } label: {
                         Circle()
                             .fill(color.gradient)
-                            .frame(width: 44, height: 44)
+                            .frame(width: Layout.circleSize, height: Layout.circleSize)
                             .overlay {
                                 if color == selected {
                                     Image(systemName: "checkmark")

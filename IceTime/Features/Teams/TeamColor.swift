@@ -31,7 +31,7 @@ enum TeamColor: String, CaseIterable, Identifiable {
     /// A soft version of the gradient for screen backgrounds.
     var background: some View {
         gradient
-            .opacity(0.15)
+            .opacity(Design.teamBackgroundOpacity)
             .ignoresSafeArea()
     }
 

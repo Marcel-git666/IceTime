@@ -19,7 +19,7 @@ struct AddEventSheet: View {
     @State private var skaterLimit = Event.defaultSkaterLimit
     @State private var frequency: RecurrenceFrequency = .none
     @State private var endChoice: EndChoice = .occurrenceCount
-    @State private var occurrenceCount = 4
+    @State private var occurrenceCount = Recurrence.defaultOccurrenceCount
     @State private var endDate = Calendar.current.date(byAdding: .month, value: 1, to: .now) ?? .now
     
     enum EndChoice: Hashable {
@@ -36,8 +36,8 @@ struct AddEventSheet: View {
                 }
                 
                 Section("Lineup") {
-                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: 1...4)
-                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: 1...40)
+                    Stepper("Goalies: \(goalieLimit)", value: $goalieLimit, in: Event.goalieLimitRange)
+                    Stepper("Skaters: \(skaterLimit)", value: $skaterLimit, in: Event.skaterLimitRange)
                 }
                 
                 Section("Repeat") {
@@ -55,7 +55,7 @@ struct AddEventSheet: View {
                         .pickerStyle(.segmented)
                         
                         if endChoice == .occurrenceCount {
-                            Stepper("\(occurrenceCount) times", value: $occurrenceCount, in: 2...Recurrence.maxOccurrences)
+                            Stepper("\(occurrenceCount) times", value: $occurrenceCount, in: Recurrence.minOccurrences...Recurrence.maxOccurrences)
                         } else {
                             DatePicker("End date", selection: $endDate, in: date..., displayedComponents: .date)
                         }

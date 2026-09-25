@@ -11,7 +11,10 @@ struct Recurrence {
     var frequency: RecurrenceFrequency
     var end: End
     
+    /// A series needs at least two events; more than a year of weekly events is capped.
+    static let minOccurrences = 2
     static let maxOccurrences = 52
+    static let defaultOccurrenceCount = 4
     
     enum End {
         case occurrenceCount(Int)

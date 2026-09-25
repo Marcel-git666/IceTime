@@ -84,16 +84,16 @@ final class EventsViewModel {
         isBusy = true
         defer { isBusy = false }
         do {
-            for date in recurrence.occurrenceDates(startingAt: template.date) {
-                let event = Event(
+            let newEvents = recurrence.occurrenceDates(startingAt: template.date).map { date in
+                Event(
                     date: date,
                     location: template.location,
                     goalieLimit: template.goalieLimit,
                     skaterLimit: template.skaterLimit
                 )
-                try await repository.createEvent(event, in: team)
-                events.append(event)
             }
+            try await repository.createEvents(newEvents, in: team)
+            events.append(contentsOf: newEvents)
             events.sort { $0.date < $1.date }
         } catch {
             errorMessage = error.userMessage

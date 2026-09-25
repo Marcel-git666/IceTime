@@ -33,7 +33,7 @@ protocol TeamRepository {
     
     // MARK: Events
     
-    func createEvent(_ event: Event, in team: Team) async throws
+    func createEvents(_ events: [Event], in team: Team) async throws
     func fetchEvents(for team: Team) async throws -> [Event]
     func updateEvent(_ event: Event, in team: Team) async throws
     

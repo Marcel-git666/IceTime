@@ -9,18 +9,24 @@ import Foundation
 import CloudKit
 
 extension CloudKitTeamRepository {
-    func createEvent(_ event: Event, in team: Team) async throws {
+    func createEvents(_ events: [Event], in team: Team) async throws {
         try requireOwner(team)
         let resolved = try await resolve(team)
-        let record = CKRecord(
-            recordType: RecordType.event,
-            recordID: CKRecord.ID(recordName: event.id.uuidString, zoneID: resolved.zoneID)
-        )
-        record["date"] = event.date
-        record["location"] = event.location
-        record["goalieLimit"] = event.goalieLimit
-        record["skaterLimit"] = event.skaterLimit
-        _ = try await resolved.database.save(record)
+        
+        let records = events.map { event in
+            let record = CKRecord(
+                recordType: RecordType.event,
+                recordID: CKRecord.ID(recordName: event.id.uuidString, zoneID: resolved.zoneID)
+            )
+            apply(event, to: record)
+            return record
+        }
+        
+        // Atomic by default in a custom zone: the whole series is saved, or none of it.
+        let (saveResults, _) = try await resolved.database.modifyRecords(saving: records, deleting: [])
+        for result in saveResults.values {
+            _ = try result.get()
+        }
     }
     
     func fetchEvents(for team: Team) async throws -> [Event] {
@@ -34,10 +40,7 @@ extension CloudKitTeamRepository {
         let resolved = try await resolve(team)
         let recordID = CKRecord.ID(recordName: event.id.uuidString, zoneID: resolved.zoneID)
         let record = try await resolved.database.record(for: recordID)
-        record["date"] = event.date
-        record["location"] = event.location
-        record["goalieLimit"] = event.goalieLimit
-        record["skaterLimit"] = event.skaterLimit
+        apply(event, to: record)
         _ = try await resolved.database.save(record)
     }
     
@@ -56,5 +59,12 @@ extension CloudKitTeamRepository {
             goalieLimit: record["goalieLimit"] as? Int ?? Event.defaultGoalieLimit,
             skaterLimit: record["skaterLimit"] as? Int ?? Event.defaultSkaterLimit
         )
+    }
+    
+    private func apply(_ event: Event, to record: CKRecord) {
+        record["date"] = event.date
+        record["location"] = event.location
+        record["goalieLimit"] = event.goalieLimit
+        record["skaterLimit"] = event.skaterLimit
     }
 }

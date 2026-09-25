@@ -226,7 +226,9 @@ struct TeamDetailView: View {
     
     private func lineupSummary(for event: Event) -> String {
         let lineup = eventsViewModel.lineup(for: event, roster: rosterViewModel.players)
-        var summary = "Goalies \(lineup.goalies.count)/\(event.goalieLimit) · Skaters \(lineup.skaters.count)/\(event.skaterLimit)"
+        let goalies = "Goalies \(lineup.goalies.count)/\(event.goalieLimit)"
+        let skaters = "Skaters \(lineup.skaters.count)/\(event.skaterLimit)"
+        var summary = "\(goalies) · \(skaters)"
         let subs = lineup.goalieSubs.count + lineup.skaterSubs.count
         if subs > 0 {
             summary += " · \(subs) subs"

@@ -7,6 +7,7 @@
 
 
 import Foundation
+import CloudKit
 import Observation
 
 @Observable
@@ -14,6 +15,7 @@ final class TeamsViewModel {
     private(set) var teams: [Team] = []
     private(set) var isBusy = false
     var errorMessage: String?
+    var share: CKShare?
     
     private let repository: TeamRepository
     
@@ -43,6 +45,17 @@ final class TeamsViewModel {
         }
     }
     
+    func prepareShare(for team: Team) async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            share = try await repository.shareTeam(team)
+        } catch {
+            errorMessage = error.userMessage
+        }
+    }
+
     func deleteTeam(_ team: Team) async {
         guard !isBusy else { return }
         isBusy = true

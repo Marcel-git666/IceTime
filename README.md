@@ -18,7 +18,7 @@ Built for the [ACoding Hackathon 2026](https://acoding.academy/hackaton26/).
 
 ## Features
 
-- **Teams**: create as many teams as you like; each one is private until you share it.
+- **Teams**: create as many teams as you like; each one is private until you share it. Teams appear as colorful cards, and every player picks their own color for each team, synced across their devices.
 - **Invites via iCloud**: share a team using the system share sheet (Messages, Mail, or a copied link). Teammates join with one tap, even when the app isn't running yet.
 - **Events and roster side by side**: each team opens on its events, with the roster one tap away in a segmented switcher, so even a 70-player roster never gets in the way.
 - **Roster**: players add themselves from their profile (name, goalie flag, phone, email). The owner can also add, edit and remove guests who don't have an iPhone. Call or email a teammate straight from the roster.
@@ -67,6 +67,7 @@ The lineup and recurrence logic is covered by unit tests (Swift Testing) in `Ice
 - **CloudKit**: custom record zones, zone-wide `CKShare`, private and shared databases, `modifyRecords` batches with atomic deletes
 - **Swift Concurrency**: `async`/`await` throughout, `async let` to load events and RSVPs in parallel
 - **Swift Testing** (`@Test`, `#expect`, `#require`) for unit tests
+- **`NSUbiquitousKeyValueStore`** (iCloud key-value storage) for personal team colors: works like `UserDefaults`, syncs across the player's own devices, and stays out of the shared team data
 - **`UICloudSharingController`** for the system invite UI, bridged with `UIViewControllerRepresentable` (no native SwiftUI equivalent exists)
 - **Scene delegate bridge** for accepting shares on both warm and cold launch (`windowScene(_:userDidAcceptCloudKitShareWith:)` and `connectionOptions.cloudKitShareMetadata`)
 - `Link` with `tel:` and `mailto:` URLs, SF Symbols, and accessibility labels for icon-only controls

@@ -7,16 +7,13 @@
 
 
 import SwiftUI
-import CloudKit
 
 struct TeamDetailView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @State private var isPresentingShareSheet = false
     @State private var isPresentingAddPlayer = false
     @State private var isPresentingAddEvent = false
     @State private var editingEvent: Event?
     @State private var editingPlayer: Player?
-    @State private var detailViewModel = TeamDetailViewModel()
     @State private var rosterViewModel = RosterViewModel()
     @State private var eventsViewModel = EventsViewModel()
     @State private var selectedSection: TeamSection = .events
@@ -32,7 +29,6 @@ struct TeamDetailView: View {
         List {
             switch selectedSection {
             case .events:
-                infoSection
                 eventsSection
             case .roster:
                 rosterSection
@@ -75,7 +71,6 @@ struct TeamDetailView: View {
         }
         .errorAlert($rosterViewModel.errorMessage)
         .errorAlert($eventsViewModel.errorMessage)
-        .errorAlert($detailViewModel.errorMessage)
         .task {
             await rosterViewModel.load(for: team)
             await eventsViewModel.load(for: team)
@@ -90,14 +85,6 @@ struct TeamDetailView: View {
                     await rosterViewModel.load(for: team)
                     await eventsViewModel.load(for: team)
                 }
-            }
-        }
-        .sheet(isPresented: $isPresentingShareSheet) {
-            if let share = detailViewModel.share {
-                ShareSheet(
-                    share: share,
-                    container: CKContainer(identifier: CloudKitTeamRepository.containerID)
-                )
             }
         }
         .sheet(isPresented: $isPresentingAddPlayer) {
@@ -141,24 +128,6 @@ struct TeamDetailView: View {
                 eventsViewModel: eventsViewModel,
                 rosterViewModel: rosterViewModel
             )
-        }
-    }
-    
-    @ViewBuilder
-    private var infoSection: some View {
-        Section {
-            Text(team.role == .owner ? "Owner" : "Participant")
-                .foregroundStyle(.secondary)
-            if team.role == .owner {
-                Button("Share Team") {
-                    Task {
-                        await detailViewModel.invite(team)
-                        if detailViewModel.share != nil {
-                            isPresentingShareSheet = true
-                        }
-                    }
-                }
-            }
         }
     }
     

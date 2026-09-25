@@ -57,11 +57,14 @@ The lineup is **never stored; it's always computed** from the roster, the RSVPs 
 
 Because nothing is stored, promoting a substitute needs no extra code: when a player in the lineup switches to *Not going*, the next person in the queue moves up the next time the lineup is computed. Re-sending the same answer is ignored, so tapping *Going* again never moves a player to the back of the queue.
 
+The lineup and recurrence logic is covered by unit tests (Swift Testing) in `IceTimeTests`.
+
 ## Native Apple APIs
 
 - **SwiftUI** with the Observation framework (`@Observable`) and `NavigationStack`
 - **CloudKit**: custom record zones, zone-wide `CKShare`, private and shared databases, `modifyRecords` batches with atomic deletes
 - **Swift Concurrency**: `async`/`await` throughout, `async let` to load events and RSVPs in parallel
+- **Swift Testing** (`@Test`, `#expect`, `#require`) for unit tests
 - **`UICloudSharingController`** for the system invite UI, bridged with `UIViewControllerRepresentable` (no native SwiftUI equivalent exists)
 - **Scene delegate bridge** for accepting shares on both warm and cold launch (`windowScene(_:userDidAcceptCloudKitShareWith:)` and `connectionOptions.cloudKitShareMetadata`)
 - `Link` with `tel:` and `mailto:` URLs, SF Symbols, and accessibility labels for icon-only controls
@@ -90,6 +93,7 @@ IceTime/
 ├── ViewModels/    @Observable view models, one per screen or feature
 ├── Views/         SwiftUI screens, sheets and small reusable views
 └── AppDelegate.swift   Scene delegate bridge for accepting CloudKit shares
+IceTimeTests/      Unit tests for the lineup and recurrence logic
 ```
 
 ## Known limitations

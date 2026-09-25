@@ -148,29 +148,6 @@ final class EventsViewModel {
     }
     
     func lineup(for event: Event, roster: [Player]) -> Lineup {
-        var lineup = Lineup()
-        var going: [(player: Player, respondedAt: Date)] = []
-        
-        for player in roster {
-            guard let rsvp = rsvp(of: player, for: event) else {
-                lineup.undecided.append(player)
-                continue
-            }
-            switch rsvp.status {
-            case .going: going.append((player, rsvp.respondedAt))
-            case .notGoing: lineup.notGoing.append(player)
-            }
-        }
-        
-        // First come, first served; everyone over the limit is a substitute
-        let queue = going.sorted { $0.respondedAt < $1.respondedAt }.map(\.player)
-        let goalieQueue = queue.filter(\.isGoalie)
-        let skaterQueue = queue.filter { !$0.isGoalie }
-        
-        lineup.goalies = Array(goalieQueue.prefix(event.goalieLimit))
-        lineup.goalieSubs = Array(goalieQueue.dropFirst(event.goalieLimit))
-        lineup.skaters = Array(skaterQueue.prefix(event.skaterLimit))
-        lineup.skaterSubs = Array(skaterQueue.dropFirst(event.skaterLimit))
-        return lineup
+        Lineup(event: event, roster: roster, rsvps: rsvps)
     }
 }

@@ -95,6 +95,14 @@ struct TeamDetailView: View {
         .sheet(isPresented: $rosterViewModel.needsProfile) {
             ProfileView(message: "Add your name so teammates know who you are.")
         }
+        .navigationDestination(for: Event.self) { event in
+            EventDetailView(
+                event: event,
+                team: team,
+                eventsViewModel: eventsViewModel,
+                rosterViewModel: rosterViewModel
+            )
+        }
     }
     
     @ViewBuilder
@@ -128,7 +136,8 @@ struct TeamDetailView: View {
             ForEach(rosterViewModel.players) { player in
                 playerRow(player)
                     .contextMenu {
-                        if let phone = player.phone, let url = URL(string: "tel:\(phone)") {
+                        if let phone = player.phone,
+                           let url = URL(string: "tel:\(phone.filter { !$0.isWhitespace })") {
                             Link("Call \(phone)", destination: url)
                         }
                         if let email = player.email, let url = URL(string: "mailto:\(email)") {
@@ -185,22 +194,24 @@ struct TeamDetailView: View {
     private var eventsSection: some View {
         Section("Events") {
             ForEach(eventsViewModel.events) { event in
-                eventRow(event)
-                    .swipeActions {
-                        if team.role == .owner {
-                            Button(role: .destructive) {
-                                Task { await eventsViewModel.deleteEvent(event, from: team) }
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                            Button {
-                                editingEvent = event
-                            } label: {
-                                Label("Edit", systemImage: "pencil")
-                            }
-                            .tint(.blue)
+                NavigationLink(value: event) {
+                    eventRow(event)
+                }
+                .swipeActions {
+                    if team.role == .owner {
+                        Button(role: .destructive) {
+                            Task { await eventsViewModel.deleteEvent(event, from: team) }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
                         }
+                        Button {
+                            editingEvent = event
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.blue)
                     }
+                }
             }
         }
     }
@@ -219,7 +230,9 @@ struct TeamDetailView: View {
             }
             Spacer()
             if let me = rosterViewModel.currentPlayer {
-                myRSVPMenu(for: me, event: event)
+                RSVPMenu(status: eventsViewModel.rsvp(of: me, for: event)?.status) { option in
+                    Task { await eventsViewModel.setRSVP(option, for: me, event: event, in: team) }
+                }
             }
         }
     }
@@ -234,39 +247,6 @@ struct TeamDetailView: View {
             summary += " · \(subs) subs"
         }
         return summary
-    }
-    
-    private func myRSVPMenu(for player: Player, event: Event) -> some View {
-        let status = eventsViewModel.rsvp(of: player, for: event)?.status
-        return Menu {
-            ForEach(RSVPStatus.allCases, id: \.self) { option in
-                Button(option.label) {
-                    Task { await eventsViewModel.setRSVP(option, for: player, event: event, in: team) }
-                }
-            }
-        
-        } label: {
-            Image(systemName: symbol(for: status))
-                .font(.title2)
-                .foregroundStyle(color(for: status))
-        }
-        .accessibilityLabel(status?.label ?? "Reply")
-    }
-    
-    private func symbol(for status: RSVPStatus?) -> String {
-        switch status {
-        case .going: "checkmark.circle.fill"
-        case .notGoing: "xmark.circle.fill"
-        case nil: "questionmark.circle"
-        }
-    }
-    
-    private func color(for status: RSVPStatus?) -> Color {
-        switch status {
-        case .going: .green
-        case .notGoing: .red
-        case nil: .gray
-        }
     }
 }
 

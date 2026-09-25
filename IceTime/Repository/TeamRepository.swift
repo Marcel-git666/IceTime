@@ -45,8 +45,8 @@ protocol TeamRepository {
     // MARK: Deletion
     
     func deleteEvent(_ event: Event, in team: Team) async throws
-    
     func deleteTeam(_ team: Team) async throws
+    func deletePlayer(_ player: Player, from team: Team) async throws
 }
 
 enum RepositoryError: LocalizedError {

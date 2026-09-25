@@ -95,9 +95,20 @@ final class RosterViewModel {
         }
     }
     
-    
     func isCurrentUser(_ player: Player) -> Bool {
         guard let currentUserRecordID else { return false }
         return player.userRecordID == currentUserRecordID
+    }
+    
+    func deletePlayer(_ player: Player, from team: Team) async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            try await repository.deletePlayer(player, from: team)
+            players.removeAll { $0.id == player.id }
+        } catch {
+            errorMessage = error.userMessage
+        }
     }
 }

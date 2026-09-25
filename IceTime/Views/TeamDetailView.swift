@@ -18,29 +18,52 @@ struct TeamDetailView: View {
     @State private var detailViewModel = TeamDetailViewModel()
     @State private var rosterViewModel = RosterViewModel()
     @State private var eventsViewModel = EventsViewModel()
+    @State private var selectedSection: TeamSection = .events
     let team: Team
+    
+    enum TeamSection: String, CaseIterable {
+        case events = "Events"
+        case roster = "Roster"
+    }
     
     var body: some View {
         List {
-            infoSection
-            rosterSection
-            eventsSection
+            switch selectedSection {
+            case .events:
+                infoSection
+                eventsSection
+            case .roster:
+                rosterSection
+            }
+        }
+        .safeAreaInset(edge: .top) {
+            Picker("Section", selection: $selectedSection) {
+                ForEach(TeamSection.allCases, id: \.self) { section in
+                    Text(section.rawValue).tag(section)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+            .background(.bar)
         }
         .navigationTitle(team.name)
         .toolbar {
             if team.role == .owner {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        isPresentingAddPlayer = true
-                    } label: {
-                        Image(systemName: "person.badge.plus")
+                    switch selectedSection {
+                    case .events:
+                        Button { isPresentingAddEvent = true } label: {
+                            Image(systemName: "calendar.badge.plus")
+                        }
+                    case .roster:
+                        Button { isPresentingAddPlayer = true } label: {
+                            Image(systemName: "person.badge.plus")
+                        }
                     }
                 }
-                
-                ToolbarItem(placement: .primaryAction) {
-                    Button { isPresentingAddEvent = true } label: {
-                        Image(systemName: "calendar.badge.plus")
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
                 }
             }
         }
@@ -144,6 +167,17 @@ struct TeamDetailView: View {
                             Link("Email \(email)", destination: url)
                         }
                     }
+                    .deleteDisabled(team.role != .owner)
+            }
+            .onDelete(perform: deletePlayers)
+        }
+    }
+    
+    private func deletePlayers(at offsets: IndexSet) {
+        let players = offsets.map { rosterViewModel.players[$0] }
+        Task {
+            for player in players {
+                await rosterViewModel.deletePlayer(player, from: team)
             }
         }
     }
@@ -212,6 +246,17 @@ struct TeamDetailView: View {
                         .tint(.blue)
                     }
                 }
+                .deleteDisabled(team.role != .owner)
+            }
+            .onDelete(perform: deleteEvents)
+        }
+    }
+
+    private func deleteEvents(at offsets: IndexSet) {
+        let events = offsets.map { eventsViewModel.events[$0] }
+        Task {
+            for event in events {
+                await eventsViewModel.deleteEvent(event, from: team)
             }
         }
     }

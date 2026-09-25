@@ -15,6 +15,7 @@ struct TeamDetailView: View {
     @State private var isPresentingAddPlayer = false
     @State private var isPresentingAddEvent = false
     @State private var editingEvent: Event?
+    @State private var editingPlayer: Player?
     @State private var detailViewModel = TeamDetailViewModel()
     @State private var rosterViewModel = RosterViewModel()
     @State private var eventsViewModel = EventsViewModel()
@@ -95,9 +96,19 @@ struct TeamDetailView: View {
             }
         }
         .sheet(isPresented: $isPresentingAddPlayer) {
-            AddPlayerSheet { name, isGoalie in
+            PlayerSheet { name, isGoalie in
                 Task {
                     await rosterViewModel.addPlayer(name: name, isGoalie: isGoalie, to: team)
+                }
+            }
+        }
+        .sheet(item: $editingPlayer) { player in
+            PlayerSheet(player: player) { name, isGoalie in
+                var updated = player
+                updated.name = name
+                updated.isGoalie = isGoalie
+                Task {
+                    await rosterViewModel.updatePlayer(updated, in: team)
                 }
             }
         }
@@ -157,7 +168,7 @@ struct TeamDetailView: View {
                 }
             }
             ForEach(rosterViewModel.players) { player in
-                playerRow(player)
+                rosterRow(player)
                     .contextMenu {
                         if let phone = player.phone,
                            let url = URL(string: "tel:\(phone.filter { !$0.isWhitespace })") {
@@ -167,12 +178,49 @@ struct TeamDetailView: View {
                             Link("Email \(email)", destination: url)
                         }
                     }
+                    .swipeActions {
+                        if team.role == .owner {
+                            Button(role: .destructive) {
+                                Task { await rosterViewModel.deletePlayer(player, from: team) }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
+                        if canEdit(player) {
+                            Button {
+                                editingPlayer = player
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
+                    }
                     .deleteDisabled(team.role != .owner)
             }
             .onDelete(perform: deletePlayers)
         }
     }
-    
+
+    /// The owner can edit guests; registered players' details come from their own profile.
+    private func canEdit(_ player: Player) -> Bool {
+        team.role == .owner && player.userRecordID == nil
+    }
+
+    /// Editable rows open the edit sheet on tap.
+    @ViewBuilder
+    private func rosterRow(_ player: Player) -> some View {
+        if canEdit(player) {
+            Button {
+                editingPlayer = player
+            } label: {
+                playerRow(player)
+            }
+            .foregroundStyle(.primary)
+        } else {
+            playerRow(player)
+        }
+    }
+
     private func deletePlayers(at offsets: IndexSet) {
         let players = offsets.map { rosterViewModel.players[$0] }
         Task {

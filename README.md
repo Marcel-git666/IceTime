@@ -20,11 +20,13 @@ Built for the [ACoding Hackathon 2026](https://acoding.academy/hackaton26/).
 
 - **Teams**: create as many teams as you like; each one is private until you share it.
 - **Invites via iCloud**: share a team using the system share sheet (Messages, Mail, or a copied link). Teammates join with one tap, even when the app isn't running yet.
-- **Roster**: players add themselves from their profile (name, goalie flag, phone, email). The owner can also add guests without an iPhone. Call or email a teammate straight from the roster.
+- **Events and roster side by side**: each team opens on its events, with the roster one tap away in a segmented switcher, so even a 70-player roster never gets in the way.
+- **Roster**: players add themselves from their profile (name, goalie flag, phone, email). The owner can also add, edit and remove guests who don't have an iPhone. Call or email a teammate straight from the roster.
 - **Events**: one-off or recurring (daily or weekly, ending after N occurrences or on a date), each with its own goalie and skater limits, for example 2 + 20 for a practice or 1 + 10 for a game against another team.
 - **One-tap RSVP**: answer *Going* or *Not going* directly from the event list. The owner can answer on behalf of guests.
 - **Automatic lineup**: the event detail shows goalies, skaters, substitutes (highlighted), players who aren't going, and those who haven't answered yet.
-- **Owner permissions**: only the team owner can share the team, add guests, and create, edit or delete events.
+- **Owner permissions**: only the team owner can share the team, manage guests and remove players, and create, edit or delete events. Editing works by tapping a row, swiping it, or with the standard **Edit** button for users who don't know the swipe gestures.
+- **Deleting cleans up after itself**: removing an event or a player also removes their RSVPs in the same atomic batch.
 
 ## How it works
 
@@ -45,7 +47,7 @@ Views (SwiftUI)  →  ViewModels (@Observable)  →  TeamRepository (protocol)  
 - **One record zone per team.** The owner's zone lives in their private database. Sharing the team shares the whole zone (`CKShare(recordZoneID:)`), so every record inside it (roster, events, RSVPs) is shared automatically without any parent/child bookkeeping. Teammates see the same zone in their shared database.
 - **Team creation is always explicit.** Nothing is created automatically on launch, so a user can join someone else's team without accidentally becoming the owner of an empty one.
 - **One RSVP per player per event, enforced by CloudKit itself.** CloudKit has no unique constraints, but record IDs are unique within a zone. Each RSVP's record name is built from the event and player IDs, so a second answer from the same player can only overwrite the first one, never duplicate it. RSVPs are saved with `savePolicy: .changedKeys`, which creates or overwrites the record in a single request without fetching it first.
-- **Deleting an event also deletes its RSVPs** in one atomic `modifyRecords` call.
+- **Deleting an event or a player also deletes their RSVPs** in one atomic `modifyRecords` call, and a recurring series is saved the same way: all of it, or none of it.
 
 ### Lineup and substitutes
 

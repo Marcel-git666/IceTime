@@ -54,6 +54,22 @@ final class RosterViewModel {
             errorMessage = error.userMessage
         }
     }
+    func updatePlayer(_ player: Player, in team: Team) async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            // addPlayerToRoster is an upsert: it updates the existing record with the same ID
+            try await repository.addPlayerToRoster(player, to: team)
+            if let index = players.firstIndex(where: { $0.id == player.id }) {
+                players[index] = player
+            }
+            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        } catch {
+            errorMessage = error.userMessage
+        }
+    }
+
     func addMyself(to team: Team) async {
         guard !isBusy, !isCurrentUserOnRoster else { return }
         isBusy = true

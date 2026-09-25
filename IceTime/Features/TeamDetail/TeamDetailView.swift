@@ -45,21 +45,19 @@ struct TeamDetailView: View {
         }
         // Our own state instead of EditButton's, so rows can show edit controls too
         .environment(\.editMode, .constant(isEditing ? .active : .inactive))
-        .safeAreaInset(edge: .top) {
-            Picker("Section", selection: $selectedSection) {
-                ForEach(TeamSection.allCases) { section in
-                    Text(section.rawValue).tag(section)
-                }
-            }
-            .pickerStyle(.segmented)
-            .padding([.horizontal, .bottom])
-            .background(.bar)
-        }
         .scrollContentBackground(.hidden)
         .background(color.background)
         .tint(color.accent)
         .navigationTitle(team.name)
         .toolbar {
+            ToolbarItem(placement: .bottomBar) {
+                Picker("Section", selection: $selectedSection) {
+                    ForEach(TeamSection.allCases) { section in
+                        Text(section.rawValue).tag(section)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
             if team.role == .owner {
                 ToolbarItem(placement: .primaryAction) {
                     switch selectedSection {

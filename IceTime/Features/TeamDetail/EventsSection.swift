@@ -20,7 +20,7 @@ struct EventsSection: View {
     }
 
     var body: some View {
-        Section("Events") {
+        Section {
             ForEach(eventsViewModel.events) { event in
                 NavigationLink(value: event) {
                     EventRow(

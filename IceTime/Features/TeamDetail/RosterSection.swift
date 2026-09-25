@@ -19,7 +19,7 @@ struct RosterSection: View {
     }
 
     var body: some View {
-        Section("Roster") {
+        Section {
             if !rosterViewModel.isCurrentUserOnRoster {
                 Button("Add myself", systemImage: "person.fill.badge.plus", action: addMyself)
             }

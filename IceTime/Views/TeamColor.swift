@@ -23,6 +23,18 @@ enum TeamColor: String, CaseIterable, Identifiable {
         LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
+    /// Used as the tint for buttons and controls inside the team.
+    var accent: Color {
+        colors[0]
+    }
+
+    /// A soft version of the gradient for screen backgrounds.
+    var background: some View {
+        gradient
+            .opacity(0.15)
+            .ignoresSafeArea()
+    }
+
     private var colors: [Color] {
         switch self {
         case .ocean: [.blue, .indigo]

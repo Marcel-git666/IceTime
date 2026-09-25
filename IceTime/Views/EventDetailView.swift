@@ -11,6 +11,7 @@ import SwiftUI
 struct EventDetailView: View {
     let event: Event
     let team: Team
+    let color: TeamColor
     let eventsViewModel: EventsViewModel
     let rosterViewModel: RosterViewModel
     @State private var isEditing = false
@@ -36,6 +37,9 @@ struct EventDetailView: View {
             playerSection("Not going", players: lineup.notGoing)
             playerSection("Undecided", players: lineup.undecided)
         }
+        .scrollContentBackground(.hidden)
+        .background(color.background)
+        .tint(color.accent)
         .navigationTitle("Event")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

@@ -53,7 +53,7 @@ struct TeamsListView: View {
                 await viewModel.load()
             }
             .navigationDestination(for: Team.self) { team in
-                TeamDetailView(team: team)
+                TeamDetailView(team: team, color: colorStore.color(for: team))
             }
             .navigationTitle("Teams")
             .toolbar {

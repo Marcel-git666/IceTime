@@ -19,6 +19,7 @@ struct TeamDetailView: View {
     @State private var selectedSection: TeamSection = .events
     @State private var isEditing = false
     let team: Team
+    let color: TeamColor
     
     enum TeamSection: String, CaseIterable {
         case events = "Events"
@@ -47,6 +48,9 @@ struct TeamDetailView: View {
             .padding(.bottom, 8)
             .background(.bar)
         }
+        .scrollContentBackground(.hidden)
+        .background(color.background)
+        .tint(color.accent)
         .navigationTitle(team.name)
         .toolbar {
             if team.role == .owner {
@@ -125,6 +129,7 @@ struct TeamDetailView: View {
             EventDetailView(
                 event: event,
                 team: team,
+                color: color,
                 eventsViewModel: eventsViewModel,
                 rosterViewModel: rosterViewModel
             )
@@ -339,6 +344,6 @@ struct TeamDetailView: View {
 
 #Preview {
     NavigationStack {
-        TeamDetailView(team: Team(id: "preview", name: "Preview Team", role: .owner))
+        TeamDetailView(team: Team(id: "preview", name: "Preview Team", role: .owner), color: .ocean)
     }
 }

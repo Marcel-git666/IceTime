@@ -185,29 +185,85 @@ struct TeamDetailView: View {
     private var eventsSection: some View {
         Section("Events") {
             ForEach(eventsViewModel.events) { event in
-                Button {
-                    if team.role == .owner {
-                        editingEvent = event
-                    }
-                } label: {
-                    VStack(alignment: .leading) {
-                        Text(event.date, format: .dateTime.day().month().year().hour().minute())
-                        Text(event.location)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .foregroundStyle(.primary)
-                .swipeActions {
-                    if team.role == .owner {
-                        Button(role: .destructive) {
-                            Task { await eventsViewModel.deleteEvent(event, from: team) }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                eventRow(event)
+                    .swipeActions {
+                        if team.role == .owner {
+                            Button(role: .destructive) {
+                                Task { await eventsViewModel.deleteEvent(event, from: team) }
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                            Button {
+                                editingEvent = event
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(.blue)
                         }
                     }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func eventRow(_ event: Event) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(event.date, format: .dateTime.day().month().year().hour().minute())
+                Text(event.location)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(lineupSummary(for: event))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            if let me = rosterViewModel.currentPlayer {
+                myRSVPMenu(for: me, event: event)
+            }
+        }
+    }
+    
+    private func lineupSummary(for event: Event) -> String {
+        let lineup = eventsViewModel.lineup(for: event, roster: rosterViewModel.players)
+        var summary = "Goalies \(lineup.goalies.count)/\(event.goalieLimit) · Skaters \(lineup.skaters.count)/\(event.skaterLimit)"
+        let subs = lineup.goalieSubs.count + lineup.skaterSubs.count
+        if subs > 0 {
+            summary += " · \(subs) subs"
+        }
+        return summary
+    }
+    
+    private func myRSVPMenu(for player: Player, event: Event) -> some View {
+        let status = eventsViewModel.rsvp(of: player, for: event)?.status
+        return Menu {
+            ForEach(RSVPStatus.allCases, id: \.self) { option in
+                Button(option.label) {
+                    Task { await eventsViewModel.setRSVP(option, for: player, event: event, in: team) }
                 }
             }
+        
+        } label: {
+            Image(systemName: symbol(for: status))
+                .font(.title2)
+                .foregroundStyle(color(for: status))
+        }
+        .accessibilityLabel(status?.label ?? "Reply")
+    }
+    
+    private func symbol(for status: RSVPStatus?) -> String {
+        switch status {
+        case .going: "checkmark.circle.fill"
+        case .notGoing: "xmark.circle.fill"
+        case nil: "questionmark.circle"
+        }
+    }
+    
+    private func color(for status: RSVPStatus?) -> Color {
+        switch status {
+        case .going: .green
+        case .notGoing: .red
+        case nil: .gray
         }
     }
 }

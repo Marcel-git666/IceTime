@@ -22,8 +22,12 @@ final class RosterViewModel {
         self.repository = repository
     }
     
+    var currentPlayer: Player? {
+        players.first { isCurrentUser($0) }
+    }
+    
     var isCurrentUserOnRoster: Bool {
-        players.contains { isCurrentUser($0) }
+        currentPlayer != nil
     }
     
     func load(for team: Team) async {

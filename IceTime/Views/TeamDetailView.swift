@@ -20,6 +20,7 @@ struct TeamDetailView: View {
     @State private var rosterViewModel = RosterViewModel()
     @State private var eventsViewModel = EventsViewModel()
     @State private var selectedSection: TeamSection = .events
+    @State private var isEditing = false
     let team: Team
     
     enum TeamSection: String, CaseIterable {
@@ -37,6 +38,8 @@ struct TeamDetailView: View {
                 rosterSection
             }
         }
+        // Our own state instead of EditButton's, so rows can show edit controls too
+        .environment(\.editMode, .constant(isEditing ? .active : .inactive))
         .safeAreaInset(edge: .top) {
             Picker("Section", selection: $selectedSection) {
                 ForEach(TeamSection.allCases, id: \.self) { section in
@@ -64,7 +67,9 @@ struct TeamDetailView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    EditButton()
+                    Button(isEditing ? "Done" : "Edit") {
+                        withAnimation { isEditing.toggle() }
+                    }
                 }
             }
         }
@@ -213,7 +218,12 @@ struct TeamDetailView: View {
             Button {
                 editingPlayer = player
             } label: {
-                playerRow(player)
+                HStack {
+                    playerRow(player)
+                    if isEditing {
+                        editIndicator
+                    }
+                }
             }
             .foregroundStyle(.primary)
         } else {
@@ -322,12 +332,27 @@ struct TeamDetailView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if let me = rosterViewModel.currentPlayer {
+            if isEditing && team.role == .owner {
+                Button {
+                    editingEvent = event
+                } label: {
+                    editIndicator
+                }
+                .buttonStyle(.borderless)
+            } else if let me = rosterViewModel.currentPlayer {
                 RSVPMenu(status: eventsViewModel.rsvp(of: me, for: event)?.status) { option in
                     Task { await eventsViewModel.setRSVP(option, for: me, event: event, in: team) }
                 }
             }
         }
+    }
+
+    /// Pencil shown on editable rows while the list is in edit mode.
+    private var editIndicator: some View {
+        Image(systemName: "pencil.circle.fill")
+            .font(.title2)
+            .foregroundStyle(.blue)
+            .accessibilityLabel("Edit")
     }
     
     private func lineupSummary(for event: Event) -> String {

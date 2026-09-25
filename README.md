@@ -25,7 +25,7 @@ Built for the [ACoding Hackathon 2026](https://acoding.academy/hackaton26/).
 - **Events**: one-off or recurring (daily or weekly, ending after N occurrences or on a date), each with its own goalie and skater limits, for example 2 + 20 for a practice or 1 + 10 for a game against another team.
 - **One-tap RSVP**: answer *Going* or *Not going* directly from the event list. The owner can answer on behalf of guests.
 - **Automatic lineup**: the event detail shows goalies, skaters, substitutes (highlighted), players who aren't going, and those who haven't answered yet.
-- **Owner permissions**: only the team owner can share the team, manage guests and remove players, and create, edit or delete events. Editing works by tapping a row, swiping it, or with the standard **Edit** button for users who don't know the swipe gestures.
+- **Owner permissions**: only the team owner can share the team, manage guests and remove players, and create, edit or delete events. Editing works by tapping a row, swiping it, or with the **Edit** button, which shows delete and edit controls on every row for users who don't know the swipe gestures.
 - **Deleting cleans up after itself**: removing an event or a player also removes their RSVPs in the same atomic batch.
 
 ## How it works

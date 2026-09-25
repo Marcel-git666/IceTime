@@ -9,50 +9,6 @@
 import Foundation
 import Observation
 
-enum RecurrenceFrequency: Hashable {
-    case none
-    case daily
-    case weekly
-}
-
-struct Recurrence {
-    var frequency: RecurrenceFrequency
-    var end: End
-    
-    static let maxOccurrences = 52
-    
-    enum End {
-        case occurrenceCount(Int)
-        case endDate(Date)
-    }
-    
-    func occurrenceDates(startingAt startDate: Date) -> [Date] {
-        guard frequency != .none else { return [startDate] }
-        let calendar = Calendar.current
-        let component: Calendar.Component = frequency == .daily ? .day : .weekOfYear
-        
-        var dates: [Date] = [startDate]
-        var current = startDate
-        
-        switch end {
-        case .occurrenceCount(let count):
-            while dates.count < count, let next = calendar.date(byAdding: component, value: 1, to: current) {
-                dates.append(next)
-                current = next
-            }
-        case .endDate(let endDate):
-            // The picker selects a day; include every occurrence on that day
-            let startOfEndDay = calendar.startOfDay(for: endDate)
-            guard let dayAfterEnd = calendar.date(byAdding: .day, value: 1, to: startOfEndDay) else { break }
-            while dates.count < Self.maxOccurrences, let next = calendar.date(byAdding: component, value: 1, to: current), next < dayAfterEnd {
-                dates.append(next)
-                current = next
-            }
-        }
-        return dates
-    }
-}
-
 @Observable
 final class EventsViewModel {
     private(set) var events: [Event] = []
@@ -94,7 +50,7 @@ final class EventsViewModel {
             }
             try await repository.createEvents(newEvents, in: team)
             events.append(contentsOf: newEvents)
-            events.sort { $0.date < $1.date }
+            events.sort()
         } catch {
             errorMessage = error.userMessage
         }
@@ -121,7 +77,7 @@ final class EventsViewModel {
             if let index = events.firstIndex(where: { $0.id == event.id }) {
                 events[index] = event
             }
-            events.sort { $0.date < $1.date }
+            events.sort()
         } catch {
             errorMessage = error.userMessage
         }

@@ -35,3 +35,23 @@ struct Player: Identifiable, Codable, Hashable {
         self.email = email
     }
 }
+
+extension Player {
+    /// A `tel:` link; spaces are removed because the Phone app can't dial them.
+    var phoneURL: URL? {
+        phone.flatMap { number in
+            URL(string: "tel:\(number.filter { !$0.isWhitespace })")
+        }
+    }
+    
+    var emailURL: URL? {
+        email.flatMap { URL(string: "mailto:\($0)") }
+    }
+}
+
+extension Player: Comparable {
+    /// Rosters are always shown alphabetically, the way Finder and Contacts sort names.
+    static func < (lhs: Player, rhs: Player) -> Bool {
+        lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+    }
+}

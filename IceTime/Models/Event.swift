@@ -31,3 +31,10 @@ struct Event: Identifiable, Codable, Hashable {
         self.skaterLimit = skaterLimit
     }
 }
+
+extension Event: Comparable {
+    /// Events are always shown in date order.
+    static func < (lhs: Event, rhs: Event) -> Bool {
+        lhs.date < rhs.date
+    }
+}

@@ -37,6 +37,7 @@ extension CloudKitTeamRepository {
     
     func fetchRSVPs(for team: Team) async throws -> [RSVP] {
         let records = try await fetchAllRecords(recordType: RecordType.rsvp, in: team)
+        // A single malformed record is skipped rather than failing the whole list
         return records.compactMap { try? rsvp(from: $0) }
     }
     

@@ -49,7 +49,7 @@ final class RosterViewModel {
             let player = Player(name: name, isGoalie: isGoalie)
             try await repository.addPlayerToRoster(player, to: team)
             players.append(player)
-            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            players.sort()
         } catch {
             errorMessage = error.userMessage
         }
@@ -64,7 +64,7 @@ final class RosterViewModel {
             if let index = players.firstIndex(where: { $0.id == player.id }) {
                 players[index] = player
             }
-            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            players.sort()
         } catch {
             errorMessage = error.userMessage
         }
@@ -83,7 +83,7 @@ final class RosterViewModel {
             let player = Player(name: profile.displayName, isGoalie: profile.isGoalie, userRecordID: userRecordID, phone: profile.phone, email: profile.email)
             try await repository.addPlayerToRoster(player, to: team)
             players.append(player)
-            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            players.sort()
         } catch {
             errorMessage = error.userMessage
         }
@@ -105,7 +105,7 @@ final class RosterViewModel {
             if let index = players.firstIndex(where: { $0.id == player.id }) {
                 players[index] = player
             }
-            players.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            players.sort()
         } catch {
             errorMessage = error.userMessage
         }

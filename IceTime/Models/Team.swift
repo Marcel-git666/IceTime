@@ -13,8 +13,3 @@ struct Team: Identifiable, Codable, Hashable {
     var name: String
     var role: TeamRole
 }
-
-enum TeamRole: String, Codable, Hashable {
-    case owner
-    case participant
-}

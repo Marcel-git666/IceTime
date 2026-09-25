@@ -11,8 +11,9 @@ import CloudKit
 extension CloudKitTeamRepository {
     func fetchRoster(for team: Team) async throws -> [Player] {
         let records = try await fetchAllRecords(recordType: RecordType.player, in: team)
+        // A single malformed record is skipped rather than failing the whole list
         return records.compactMap { try? player(from: $0) }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            .sorted()
     }
     
     func addPlayerToRoster(_ player: Player, to team: Team) async throws {

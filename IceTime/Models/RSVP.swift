@@ -13,15 +13,3 @@ struct RSVP: Codable, Hashable {
     var status: RSVPStatus
     var respondedAt: Date = .now
 }
-
-enum RSVPStatus: String, Codable, CaseIterable, Hashable {
-    case going
-    case notGoing
-    
-    var label: String {
-        switch self {
-        case .going: return "Going"
-        case .notGoing: return "Not going"
-        }
-    }
-}

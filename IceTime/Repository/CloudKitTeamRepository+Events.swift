@@ -31,8 +31,9 @@ extension CloudKitTeamRepository {
     
     func fetchEvents(for team: Team) async throws -> [Event] {
         let records = try await fetchAllRecords(recordType: RecordType.event, in: team)
+        // A single malformed record is skipped rather than failing the whole list
         return records.compactMap { try? event(from: $0) }
-            .sorted { $0.date < $1.date }
+            .sorted()
     }
     
     func updateEvent(_ event: Event, in team: Team) async throws {

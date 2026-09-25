@@ -14,7 +14,8 @@ struct EventDetailView: View {
     let color: TeamColor
     let eventsViewModel: EventsViewModel
     let rosterViewModel: RosterViewModel
-    @State private var isEditing = false
+
+    @State private var isPresentingEdit = false
 
     /// The latest version from the view model, so edits show up immediately.
     private var currentEvent: Event {
@@ -29,13 +30,13 @@ struct EventDetailView: View {
                 Text(currentEvent.location)
                     .foregroundStyle(.secondary)
             }
-            playerSection("Goalies \(lineup.goalies.count)/\(currentEvent.goalieLimit)",
-                          players: lineup.goalies, showsWhenEmpty: true)
-            playerSection("Skaters \(lineup.skaters.count)/\(currentEvent.skaterLimit)",
-                          players: lineup.skaters, showsWhenEmpty: true)
-            playerSection("Substitutes", players: lineup.goalieSubs + lineup.skaterSubs, color: .orange)
-            playerSection("Not going", players: lineup.notGoing)
-            playerSection("Undecided", players: lineup.undecided)
+            section("Goalies \(lineup.goalies.count)/\(currentEvent.goalieLimit)",
+                    players: lineup.goalies, showsWhenEmpty: true)
+            section("Skaters \(lineup.skaters.count)/\(currentEvent.skaterLimit)",
+                    players: lineup.skaters, showsWhenEmpty: true)
+            section("Substitutes", players: lineup.goalieSubs + lineup.skaterSubs, isSubstitute: true)
+            section("Not going", players: lineup.notGoing)
+            section("Undecided", players: lineup.undecided)
         }
         .scrollContentBackground(.hidden)
         .background(color.background)
@@ -44,13 +45,13 @@ struct EventDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if team.role == .owner {
-                Button("Edit") { isEditing = true }
+                Button("Edit") {
+                    isPresentingEdit = true
+                }
             }
         }
-        .sheet(isPresented: $isEditing) {
-            EditEventSheet(event: currentEvent) { updated in
-                Task { await eventsViewModel.updateEvent(updated, in: team) }
-            }
+        .sheet(isPresented: $isPresentingEdit) {
+            EditEventSheet(event: currentEvent, onSave: save)
         }
         .refreshable {
             await rosterViewModel.load(for: team)
@@ -58,41 +59,26 @@ struct EventDetailView: View {
         }
     }
 
-    @ViewBuilder
-    private func playerSection(
+    /// Fills in the parameters every lineup section shares.
+    private func section(
         _ title: String,
         players: [Player],
-        color: Color = .primary,
+        isSubstitute: Bool = false,
         showsWhenEmpty: Bool = false
-    ) -> some View {
-        if showsWhenEmpty || !players.isEmpty {
-            Section(title) {
-                ForEach(players) { player in
-                    HStack {
-                        Text(player.name)
-                            .foregroundStyle(color)
-                        if player.isGoalie {
-                            Text("Goalie")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        rsvpControl(for: player)
-                    }
-                }
-            }
-        }
+    ) -> LineupSection {
+        LineupSection(
+            title: title,
+            players: players,
+            isSubstitute: isSubstitute,
+            showsWhenEmpty: showsWhenEmpty,
+            event: currentEvent,
+            team: team,
+            eventsViewModel: eventsViewModel,
+            rosterViewModel: rosterViewModel
+        )
     }
 
-    @ViewBuilder
-    private func rsvpControl(for player: Player) -> some View {
-        let status = eventsViewModel.rsvp(of: player, for: currentEvent)?.status
-        if team.role == .owner || rosterViewModel.isCurrentUser(player) {
-            RSVPMenu(status: status) { option in
-                Task { await eventsViewModel.setRSVP(option, for: player, event: currentEvent, in: team) }
-            }
-        } else {
-            RSVPStatusIcon(status: status)
-        }
+    private func save(_ event: Event) {
+        Task { await eventsViewModel.updateEvent(event, in: team) }
     }
 }

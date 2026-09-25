@@ -114,6 +114,7 @@ final class CloudKitTeamRepository: TeamRepository {
                         resultsLimit: CKQueryOperation.maximumResults
                     )
                 }
+                // A record that fails to load on its own is skipped; the rest of the page still shows
                 for (_, result) in page.matchResults {
                     if let record = try? result.get() { out.append(record) }
                 }

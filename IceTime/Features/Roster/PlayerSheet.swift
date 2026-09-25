@@ -10,11 +10,13 @@ import SwiftUI
 
 /// Adds a new guest player, or edits an existing one when `player` is given.
 struct PlayerSheet: View {
+    let onSave: (String, Bool) -> Void
+    private let isEditing: Bool
+    
     @Environment(\.dismiss) private var dismiss
+    
     @State private var name: String
     @State private var isGoalie: Bool
-    private let isEditing: Bool
-    let onSave: (String, Bool) -> Void
 
     init(player: Player? = nil, onSave: @escaping (String, Bool) -> Void) {
         _name = State(initialValue: player?.name ?? "")
@@ -35,13 +37,15 @@ struct PlayerSheet: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(isEditing ? "Save" : "Add") {
-                        onSave(name, isGoalie)
-                        dismiss()
-                    }
-                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    Button(isEditing ? "Save" : "Add", action: save)
+                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }
+    }
+    
+    private func save() {
+        onSave(name, isGoalie)
+        dismiss()
     }
 }

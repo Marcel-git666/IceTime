@@ -9,14 +9,15 @@
 import SwiftUI
 
 struct EditEventSheet: View {
+    let event: Event
+    let onSave: (Event) -> Void
+    
     @Environment(\.dismiss) private var dismiss
+    
     @State private var date: Date
     @State private var location: String
     @State private var goalieLimit: Int
     @State private var skaterLimit: Int
-    
-    let event: Event
-    let onSave: (Event) -> Void
     
     init(event: Event, onSave: @escaping (Event) -> Void) {
         self.event = event
@@ -46,18 +47,20 @@ struct EditEventSheet: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        var updated = event
-                        updated.date = date
-                        updated.location = location
-                        updated.goalieLimit = goalieLimit
-                        updated.skaterLimit = skaterLimit
-                        onSave(updated)
-                        dismiss()
-                    }
-                    .disabled(location.trimmingCharacters(in: .whitespaces).isEmpty)
+                    Button("Save", action: save)
+                        .disabled(location.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }
+    }
+    
+    private func save() {
+        var updated = event
+        updated.date = date
+        updated.location = location
+        updated.goalieLimit = goalieLimit
+        updated.skaterLimit = skaterLimit
+        onSave(updated)
+        dismiss()
     }
 }

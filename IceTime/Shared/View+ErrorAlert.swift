@@ -14,7 +14,6 @@ extension View {
             get: { message.wrappedValue != nil },
             set: { if !$0 { message.wrappedValue = nil } }
         )) {
-            Button("OK") {}
         } message: {
             Text(message.wrappedValue ?? "")
         }

@@ -9,16 +9,18 @@
 import SwiftUI
 
 struct AddEventSheet: View {
+    let onAdd: (Event, Recurrence) -> Void
+    
     @Environment(\.dismiss) private var dismiss
-    @State private var date = Date()
+    
+    @State private var date = Date.now
     @State private var location = ""
+    @State private var goalieLimit = Event.defaultGoalieLimit
+    @State private var skaterLimit = Event.defaultSkaterLimit
     @State private var frequency: RecurrenceFrequency = .none
     @State private var endChoice: EndChoice = .occurrenceCount
     @State private var occurrenceCount = 4
-    @State private var endDate = Date().addingTimeInterval(60 * 60 * 24 * 30)
-    @State private var goalieLimit = Event.defaultGoalieLimit
-    @State private var skaterLimit = Event.defaultSkaterLimit
-    let onAdd: (Event, Recurrence) -> Void
+    @State private var endDate = Calendar.current.date(byAdding: .month, value: 1, to: .now) ?? .now
     
     enum EndChoice: Hashable {
         case occurrenceCount
@@ -66,17 +68,19 @@ struct AddEventSheet: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        let end: Recurrence.End = endChoice == .occurrenceCount
-                        ? .occurrenceCount(occurrenceCount)
-                        : .endDate(endDate)
-                        let template = Event(date: date, location: location, goalieLimit: goalieLimit, skaterLimit: skaterLimit)
-                        onAdd(template, Recurrence(frequency: frequency, end: end))
-                        dismiss()
-                    }
-                    .disabled(location.trimmingCharacters(in: .whitespaces).isEmpty)
+                    Button("Add", action: add)
+                        .disabled(location.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
         }
+    }
+    
+    private func add() {
+        let end: Recurrence.End = endChoice == .occurrenceCount
+            ? .occurrenceCount(occurrenceCount)
+            : .endDate(endDate)
+        let template = Event(date: date, location: location, goalieLimit: goalieLimit, skaterLimit: skaterLimit)
+        onAdd(template, Recurrence(frequency: frequency, end: end))
+        dismiss()
     }
 }

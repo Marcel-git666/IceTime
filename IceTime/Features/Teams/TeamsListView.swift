@@ -10,6 +10,8 @@ import SwiftUI
 import CloudKit
 
 struct TeamsListView: View {
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var viewModel = TeamsViewModel()
     @State private var colorStore = TeamColorStore()
     @State private var isShowingNewTeamAlert = false
@@ -17,13 +19,16 @@ struct TeamsListView: View {
     @State private var isPresentingProfile = false
     @State private var isPresentingShareSheet = false
     @State private var colorPickerTeam: Team?
-    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
             List(viewModel.teams) { team in
                 NavigationLink(value: team) {
-                    teamCard(team)
+                    TeamCard(
+                        team: team,
+                        onShare: { share(team) },
+                        onChangeColor: { colorPickerTeam = team }
+                    )
                 }
                 .listRowBackground(
                     RoundedRectangle(cornerRadius: 16)
@@ -32,46 +37,26 @@ struct TeamsListView: View {
                 .listRowSeparator(.hidden)
                 .swipeActions {
                     if team.role == .owner {
-                        Button(role: .destructive) {
-                            Task { await viewModel.deleteTeam(team) }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+                        Button("Delete", systemImage: "trash", role: .destructive) {
+                            delete(team)
                         }
                     }
                 }
             }
             .listRowSpacing(12)
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    Task { await viewModel.load() }
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .teamShareAccepted)) { _ in
-                Task { await viewModel.load() }
-            }
-            .refreshable {
-                await viewModel.load()
-            }
+            .navigationTitle("Teams")
             .navigationDestination(for: Team.self) { team in
                 TeamDetailView(team: team, color: colorStore.color(for: team))
             }
-            .navigationTitle("Teams")
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        newTeamName = ""
-                        isShowingNewTeamAlert = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .disabled(viewModel.isBusy)
-                }
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
+                    Button("My Profile", systemImage: "person.crop.circle") {
                         isPresentingProfile = true
-                    } label: {
-                        Image(systemName: "person.crop.circle")
                     }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("New Team", systemImage: "plus", action: showNewTeamAlert)
+                        .disabled(viewModel.isBusy)
                 }
             }
             .overlay {
@@ -82,14 +67,24 @@ struct TeamsListView: View {
             .task {
                 await viewModel.load()
             }
+            .refreshable {
+                await viewModel.load()
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    Task { await viewModel.load() }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .teamShareAccepted)) { _ in
+                Task { await viewModel.load() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .teamShareAcceptFailed)) { notification in
+                viewModel.errorMessage = notification.object as? String
+            }
             .alert("New Team", isPresented: $isShowingNewTeamAlert) {
                 TextField("Team name", text: $newTeamName)
                 Button("Cancel", role: .cancel) {}
-                Button("Create") {
-                    Task {
-                        await viewModel.createTeam(name: newTeamName)
-                    }
-                }
+                Button("Create", action: createTeam)
             }
             .errorAlert($viewModel.errorMessage)
             .sheet(isPresented: $isPresentingProfile) {
@@ -112,51 +107,25 @@ struct TeamsListView: View {
         }
     }
 
-    private func teamCard(_ team: Team) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(team.name)
-                    .font(.title3.bold())
-                Label(
-                    team.role == .owner ? "Owner" : "Participant",
-                    systemImage: team.role == .owner ? "crown.fill" : "person.fill"
-                )
-                .font(.caption)
-                .opacity(0.85)
-            }
-            Spacer()
-            teamMenu(team)
-        }
-        .foregroundStyle(.white)
-        .padding(.vertical, 12)
+    private func showNewTeamAlert() {
+        newTeamName = ""
+        isShowingNewTeamAlert = true
     }
 
-    private func teamMenu(_ team: Team) -> some View {
-        Menu {
-            if team.role == .owner {
-                Button {
-                    Task { await share(team) }
-                } label: {
-                    Label("Share Team", systemImage: "square.and.arrow.up")
-                }
-            }
-            Button {
-                colorPickerTeam = team
-            } label: {
-                Label("Change Color", systemImage: "paintpalette")
-            }
-        } label: {
-            Image(systemName: "ellipsis.circle.fill")
-                .font(.title2)
-                .foregroundStyle(.white)
-        }
-        .buttonStyle(.borderless)
+    private func createTeam() {
+        Task { await viewModel.createTeam(name: newTeamName) }
     }
 
-    private func share(_ team: Team) async {
-        await viewModel.prepareShare(for: team)
-        if viewModel.share != nil {
-            isPresentingShareSheet = true
+    private func delete(_ team: Team) {
+        Task { await viewModel.deleteTeam(team) }
+    }
+
+    private func share(_ team: Team) {
+        Task {
+            await viewModel.prepareShare(for: team)
+            if viewModel.share != nil {
+                isPresentingShareSheet = true
+            }
         }
     }
 }

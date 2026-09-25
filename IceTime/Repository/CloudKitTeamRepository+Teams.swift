@@ -30,10 +30,13 @@ extension CloudKitTeamRepository {
     
     private func teamName(for zoneID: CKRecordZone.ID, in database: CKDatabase) async throws -> String {
         let recordID = CKRecord.ID(recordName: RecordType.teamInfo, zoneID: zoneID)
-        if let record = try? await database.record(for: recordID), let name = record["name"] as? String {
-            return name
+        // Only a missing TeamInfo record means "unnamed"; network errors must reach the user
+        do {
+            let record = try await database.record(for: recordID)
+            return record["name"] as? String ?? "Unnamed Team"
+        } catch let error as CKError where error.code == .unknownItem {
+            return "Unnamed Team"
         }
-        return "Unnamed Team"
     }
     
     func createTeam(name: String) async throws -> Team {

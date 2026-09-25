@@ -89,14 +89,21 @@ The project uses the author's CloudKit container, which is tied to their develop
 
 ## Project structure
 
+Folders follow the app's features, with one type per file:
+
 ```
 IceTime/
-├── Models/        Plain structs: Team, Player, Event, RSVP, Lineup, Profile
-├── Repository/    TeamRepository protocol and its CloudKit implementation
-├── ViewModels/    @Observable view models, one per screen or feature
-├── Views/         SwiftUI screens, sheets and small reusable views
-└── AppDelegate.swift   Scene delegate bridge for accepting CloudKit shares
-IceTimeTests/      Unit tests for the lineup and recurrence logic
+├── App/            App entry point, and the app/scene delegates that accept CloudKit shares
+├── Features/
+│   ├── Teams/      Team cards, colors, sharing (TeamsListView, TeamCard, TeamColorPicker...)
+│   ├── TeamDetail/ Team screen with the Events / Roster switcher and their rows
+│   ├── Events/     Event detail, lineup sections, RSVP controls, add/edit event sheets
+│   ├── Roster/     Roster view model and the add/edit player sheet
+│   └── Profile/    The player's own profile
+├── Models/         Plain structs and enums: Team, Player, Event, RSVP, Lineup, Recurrence...
+├── Repository/     TeamRepository protocol and its CloudKit implementation
+└── Shared/         Small reusable pieces: error alert modifier, edit indicator
+IceTimeTests/       Unit tests for the lineup and recurrence logic
 ```
 
 ## Known limitations

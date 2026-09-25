@@ -32,7 +32,7 @@ struct ShareSheet: UIViewControllerRepresentable {
         }
         
         func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {
-            print("Share failed: \(error)")
+            // Nothing to do here: the sharing controller shows its own error alert to the user.
         }
     }
 }

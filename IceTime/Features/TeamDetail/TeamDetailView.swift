@@ -58,7 +58,9 @@ struct TeamDetailView: View {
                 }
                 .pickerStyle(.segmented)
                 .fixedSize()
+                .glassEffect(.regular.tint(color.accent.opacity(0.3)))
             }
+            .sharedBackgroundVisibility(.hidden)
             if team.role == .owner {
                 ToolbarItem(placement: .primaryAction) {
                     switch selectedSection {
@@ -72,9 +74,11 @@ struct TeamDetailView: View {
                         }
                     }
                 }
+                .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(isEditing ? "Done" : "Edit", action: toggleEditing)
                 }
+                .sharedBackgroundVisibility(.hidden)
             }
         }
         .errorAlert($rosterViewModel.errorMessage)

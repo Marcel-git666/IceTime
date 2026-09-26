@@ -26,9 +26,12 @@ struct EventDetailView: View {
         let lineup = eventsViewModel.lineup(for: currentEvent, roster: rosterViewModel.players)
         List {
             Section {
-                Text(currentEvent.date, format: .dateTime.weekday(.wide).day().month().hour().minute())
-                Text(currentEvent.location)
-                    .foregroundStyle(.secondary)
+                Group {
+                    Text(currentEvent.date, format: .dateTime.weekday(.wide).day().month().hour().minute())
+                    Text(currentEvent.location)
+                        .foregroundStyle(.secondary)
+                }
+                .translucentRowBackground()
             }
             section("Goalies \(lineup.goalies.count)/\(currentEvent.goalieLimit)",
                     players: lineup.goalies, showsWhenEmpty: true)

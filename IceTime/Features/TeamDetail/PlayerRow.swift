@@ -48,6 +48,5 @@ struct PlayerRow: View {
                 EditIndicator()
             }
         }
-        .listRowBackground(isCurrentUser ? Color.yellow.opacity(Design.currentUserHighlightOpacity) : nil)
     }
 }

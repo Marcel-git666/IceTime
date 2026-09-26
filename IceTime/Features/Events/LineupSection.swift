@@ -39,6 +39,7 @@ struct LineupSection: View {
                             RSVPStatusIcon(status: status(of: player))
                         }
                     }
+                    .translucentRowBackground()
                 }
             }
         }

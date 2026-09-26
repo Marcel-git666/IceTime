@@ -45,6 +45,7 @@ struct EventsSection: View {
                     }
                 }
                 .deleteDisabled(!isOwner)
+                .translucentRowBackground()
             }
             .onDelete(perform: deleteEvents)
         }

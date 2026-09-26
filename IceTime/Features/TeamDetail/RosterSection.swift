@@ -59,6 +59,13 @@ struct RosterSection: View {
                     }
                 }
                 .deleteDisabled(!isOwner)
+                .listRowBackground(
+                    Rectangle().fill(
+                        rosterViewModel.isCurrentUser(player)
+                        ? AnyShapeStyle(.tint.opacity(Design.currentUserHighlightOpacity))
+                        : AnyShapeStyle(.thinMaterial)
+                    )
+                )
             }
             .onDelete(perform: deletePlayers)
         }

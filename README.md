@@ -8,6 +8,8 @@ No backend, no accounts to create, no third-party dependencies: your team lives 
 
 Built for the [ACoding Hackathon 2026](https://acoding.academy/hackaton26/).
 
+▶️ **[Watch the demo video](https://youtu.be/Pmz673_4Eag)**
+
 <p align="center">
   <img src="docs/screenshots/teams.png" width="200" alt="Teams as colored cards">
   <img src="docs/screenshots/team-detail.png" width="200" alt="Team events with lineup summaries">

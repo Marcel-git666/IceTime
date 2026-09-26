@@ -17,7 +17,7 @@ final class ProfileViewModel {
     
     private let repository: TeamRepository
     
-    init(repository: TeamRepository = CloudKitTeamRepository()) {
+    init(repository: TeamRepository = CloudKitTeamRepository.shared) {
         self.repository = repository
     }
     

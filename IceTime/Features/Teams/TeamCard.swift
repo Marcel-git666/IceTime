@@ -17,11 +17,11 @@ struct TeamCard: View {
     let team: Team
     let onShare: () -> Void
     let onChangeColor: () -> Void
-
+    
     private var isOwner: Bool {
         team.role == .owner
     }
-
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading) {

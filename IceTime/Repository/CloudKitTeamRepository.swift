@@ -10,12 +10,15 @@ import Foundation
 import CloudKit
 
 final class CloudKitTeamRepository: TeamRepository {
+    /// One instance for the whole app, so every screen shares the zone cache
+    /// instead of looking up the same zones again.
+    static let shared = CloudKitTeamRepository()
     static let containerID = "iCloud.com.marcel.IceTime"
     static let teamZonePrefix = "Team-"
     
     let container: CKContainer
     
-    init() {
+    private init() {
         container = CKContainer(identifier: Self.containerID)
     }
     

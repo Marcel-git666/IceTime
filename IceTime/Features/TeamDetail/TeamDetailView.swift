@@ -50,13 +50,14 @@ struct TeamDetailView: View {
         .tint(color.accent)
         .navigationTitle(team.name)
         .toolbar {
-            ToolbarItem(placement: .bottomBar) {
+            ToolbarItem(placement: .status) {
                 Picker("Section", selection: $selectedSection) {
                     ForEach(TeamSection.allCases) { section in
                         Text(section.rawValue).tag(section)
                     }
                 }
                 .pickerStyle(.segmented)
+                .fixedSize()
             }
             if team.role == .owner {
                 ToolbarItem(placement: .primaryAction) {

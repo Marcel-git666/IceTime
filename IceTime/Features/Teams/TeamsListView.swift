@@ -19,9 +19,10 @@ struct TeamsListView: View {
     @State private var isPresentingProfile = false
     @State private var isPresentingShareSheet = false
     @State private var colorPickerTeam: Team?
+    @State private var path = NavigationPath()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List(viewModel.teams) { team in
                 NavigationLink(value: team) {
                     TeamCard(
@@ -71,7 +72,8 @@ struct TeamsListView: View {
                 await viewModel.load()
             }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
+                // Only when the teams list is visible; an open team reloads its own data
+                if newPhase == .active && path.isEmpty {
                     Task { await viewModel.load() }
                 }
             }

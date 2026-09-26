@@ -63,6 +63,9 @@ struct AddEventSheet: View {
                 }
             }
             .navigationTitle("Add Event")
+            .onChange(of: date) {
+                keepEndDateAfterStart()
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -77,10 +80,17 @@ struct AddEventSheet: View {
     
     private func add() {
         let end: Recurrence.End = endChoice == .occurrenceCount
-            ? .occurrenceCount(occurrenceCount)
-            : .endDate(endDate)
+        ? .occurrenceCount(occurrenceCount)
+        : .endDate(endDate)
         let template = Event(date: date, location: location, goalieLimit: goalieLimit, skaterLimit: skaterLimit)
         onAdd(template, Recurrence(frequency: frequency, end: end))
         dismiss()
+    }
+    
+    /// Moving the start past the chosen end would silently turn the series into a single event.
+    private func keepEndDateAfterStart() {
+        if endDate < date {
+            endDate = Calendar.current.date(byAdding: .month, value: 1, to: date) ?? date
+        }
     }
 }

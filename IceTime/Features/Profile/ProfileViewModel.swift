@@ -27,7 +27,9 @@ final class ProfileViewModel {
         do {
             profile = try await repository.fetchProfile() ?? Profile()
         } catch {
-            errorMessage = error.userMessage
+            if !error.isCancellation {
+                errorMessage = error.userMessage
+            }
         }
     }
     

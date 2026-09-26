@@ -8,6 +8,12 @@
 import CloudKit
 
 extension Error {
+    /// True when the work was cancelled on purpose, e.g. the user left the screen mid-load.
+    var isCancellation: Bool {
+        if self is CancellationError { return true }
+        return (self as? CKError)?.code == .operationCancelled
+    }
+    
     /// A message suitable for showing to the user.
     var userMessage: String {
         guard let ckError = self as? CKError else {

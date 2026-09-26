@@ -29,16 +29,19 @@ final class TeamsViewModel {
         do {
             teams = try await repository.fetchTeams()
         } catch {
-            errorMessage = error.userMessage
+            if !error.isCancellation {
+                errorMessage = error.userMessage
+            }
         }
     }
     
     func createTeam(name: String) async {
-        guard !isBusy else { return }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !isBusy, !trimmedName.isEmpty else { return }
         isBusy = true
         defer { isBusy = false }
         do {
-            let team = try await repository.createTeam(name: name)
+            let team = try await repository.createTeam(name: trimmedName)
             teams.append(team)
         } catch {
             errorMessage = error.userMessage
@@ -46,6 +49,7 @@ final class TeamsViewModel {
     }
     
     func prepareShare(for team: Team) async {
+        share = nil
         guard !isBusy else { return }
         isBusy = true
         defer { isBusy = false }

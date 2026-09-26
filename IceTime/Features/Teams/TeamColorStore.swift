@@ -13,21 +13,29 @@ import Observation
 /// but syncs across the player's own devices, and stays out of the shared team data.
 @Observable
 final class TeamColorStore {
-    private static let key = "teamColors"
+    private static let keyPrefix = "teamColor."
     private let store = NSUbiquitousKeyValueStore.default
-    private var choices: [String: String] = [:]
-
+    /// Colors picked while the app runs, so views update right away.
+    private var choices: [String: TeamColor] = [:]
+    
     init() {
         store.synchronize()
-        choices = store.dictionary(forKey: Self.key) as? [String: String] ?? [:]
     }
-
+    
     func color(for team: Team) -> TeamColor {
-        choices[team.id].flatMap(TeamColor.init(rawValue:)) ?? .defaultColor(for: team)
+        if let choice = choices[team.id] {
+            return choice
+        }
+        let saved = store.string(forKey: key(for: team)).flatMap(TeamColor.init(rawValue:))
+        return saved ?? .defaultColor(for: team)
     }
-
+    
     func setColor(_ color: TeamColor, for team: Team) {
-        choices[team.id] = color.rawValue
-        store.set(choices, forKey: Self.key)
+        choices[team.id] = color
+        store.set(color.rawValue, forKey: key(for: team))
+    }
+    
+    private func key(for team: Team) -> String {
+        Self.keyPrefix + team.id
     }
 }

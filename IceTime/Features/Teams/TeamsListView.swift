@@ -87,6 +87,7 @@ struct TeamsListView: View {
                 TextField("Team name", text: $newTeamName)
                 Button("Cancel", role: .cancel) {}
                 Button("Create", action: createTeam)
+                    .disabled(newTeamName.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .errorAlert($viewModel.errorMessage)
             .sheet(isPresented: $isPresentingProfile) {

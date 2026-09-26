@@ -37,7 +37,9 @@ final class RosterViewModel {
             players = try await repository.fetchRoster(for: team)
             currentUserRecordID = try await repository.currentUserRecordID()
         } catch {
-            errorMessage = error.userMessage
+            if !error.isCancellation {
+                errorMessage = error.userMessage
+            }
         }
     }
     
@@ -76,6 +78,9 @@ final class RosterViewModel {
         defer { isBusy = false }
         do {
             let userRecordID = try await repository.currentUserRecordID()
+            // load() may have failed to get the user ID, which made the button appear for someone already on the roster
+            currentUserRecordID = userRecordID
+            guard !players.contains(where: { $0.userRecordID == userRecordID }) else { return }
             guard let profile = try await repository.fetchProfile(), !profile.displayName.isEmpty else {
                 needsProfile = true
                 return
@@ -94,13 +99,16 @@ final class RosterViewModel {
         isBusy = true
         defer { isBusy = false }
         do {
-            let profile = try await repository.fetchProfile()
-            if let name = profile?.displayName, !name.isEmpty {
-                player.name = name
+            guard let profile = try await repository.fetchProfile() else {
+                needsProfile = true
+                return
             }
-            player.isGoalie = profile?.isGoalie ?? false
-            player.phone = profile?.phone
-            player.email = profile?.email
+            if !profile.displayName.isEmpty {
+                player.name = profile.displayName
+            }
+            player.isGoalie = profile.isGoalie
+            player.phone = profile.phone
+            player.email = profile.email
             try await repository.addPlayerToRoster(player, to: team)
             if let index = players.firstIndex(where: { $0.id == player.id }) {
                 players[index] = player

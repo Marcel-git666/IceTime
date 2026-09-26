@@ -31,7 +31,9 @@ final class EventsViewModel {
             events = try await fetchedEvents
             rsvps = try await fetchedRSVPs
         } catch {
-            errorMessage = error.userMessage
+            if !error.isCancellation {
+                errorMessage = error.userMessage
+            }
         }
     }
     

@@ -8,13 +8,12 @@ No backend, no accounts to create, no third-party dependencies: your team lives 
 
 Built for the [ACoding Hackathon 2026](https://acoding.academy/hackaton26/).
 
-<!-- Screenshots: add images to docs/screenshots/ and uncomment
 <p align="center">
-  <img src="docs/screenshots/teams.png" width="230">
-  <img src="docs/screenshots/team-detail.png" width="230">
-  <img src="docs/screenshots/event-detail.png" width="230">
+  <img src="docs/screenshots/teams.png" width="200" alt="Teams as colored cards">
+  <img src="docs/screenshots/team-detail.png" width="200" alt="Team events with lineup summaries">
+  <img src="docs/screenshots/event-detail.png" width="200" alt="Event lineup with substitutes">
+  <img src="docs/screenshots/roster-dark.png" width="200" alt="Roster in dark mode">
 </p>
--->
 
 ## Features
 

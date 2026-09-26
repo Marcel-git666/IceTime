@@ -46,6 +46,7 @@ struct EventDetailView: View {
         .tint(color.accent)
         .navigationTitle("Event")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarVisibility(.hidden, for: .bottomBar)
         .toolbar {
             if team.role == .owner {
                 Button("Edit") {

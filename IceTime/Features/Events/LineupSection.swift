@@ -9,7 +9,7 @@ import SwiftUI
 
 /// One group of the event lineup (goalies, skaters, substitutes...) with each player's answer.
 struct LineupSection: View {
-    let title: String
+    let title: LocalizedStringKey
     let players: [Player]
     var isSubstitute = false
     var showsWhenEmpty = false

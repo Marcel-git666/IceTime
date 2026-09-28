@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ProfileView: View {
     /// Optional explanation shown above the form, e.g. why the profile was opened.
-    var message: String?
+    var message: LocalizedStringKey?
     
     @Environment(\.dismiss) private var dismiss
     

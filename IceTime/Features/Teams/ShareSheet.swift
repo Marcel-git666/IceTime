@@ -28,7 +28,7 @@ struct ShareSheet: UIViewControllerRepresentable {
     
     final class Coordinator: NSObject, UICloudSharingControllerDelegate {
         func itemTitle(for csc: UICloudSharingController) -> String? {
-            "IceTime Team"
+            String(localized: "IceTime Team")
         }
         
         func cloudSharingController(_ csc: UICloudSharingController, failedToSaveShareWithError error: Error) {

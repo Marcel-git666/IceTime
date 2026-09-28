@@ -21,15 +21,15 @@ extension Error {
         }
         switch ckError.code {
         case .networkUnavailable, .networkFailure:
-            return "You're offline. Check your internet connection and try again."
+            return String(localized: "You're offline. Check your internet connection and try again.")
         case .notAuthenticated:
-            return "Sign into iCloud in Settings to use IceTime."
+            return String(localized: "Sign into iCloud in Settings to use IceTime.")
         case .serviceUnavailable, .requestRateLimited, .zoneBusy:
-            return "iCloud is busy right now. Please try again in a moment."
+            return String(localized: "iCloud is busy right now. Please try again in a moment.")
         case .quotaExceeded:
-            return "Your iCloud storage is full."
+            return String(localized: "Your iCloud storage is full.")
         case .permissionFailure:
-            return "You don't have permission to make this change."
+            return String(localized: "You don't have permission to make this change.")
         default:
             return localizedDescription
         }

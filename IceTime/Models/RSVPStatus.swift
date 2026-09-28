@@ -13,8 +13,8 @@ enum RSVPStatus: String, Codable, CaseIterable, Hashable {
     
     var label: String {
         switch self {
-        case .going: "Going"
-        case .notGoing: "Not going"
+        case .going: String(localized: "Going")
+        case .notGoing: String(localized: "Not going")
         }
     }
 }

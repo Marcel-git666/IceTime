@@ -33,9 +33,9 @@ extension CloudKitTeamRepository {
         // Only a missing TeamInfo record means "unnamed"; network errors must reach the user
         do {
             let record = try await database.record(for: recordID)
-            return record["name"] as? String ?? "Unnamed Team"
+            return record["name"] as? String ?? String(localized: "Unnamed Team")
         } catch let error as CKError where error.code == .unknownItem {
-            return "Unnamed Team"
+            return String(localized: "Unnamed Team")
         }
     }
     

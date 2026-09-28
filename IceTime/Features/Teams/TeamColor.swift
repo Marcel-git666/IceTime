@@ -19,6 +19,17 @@ enum TeamColor: String, CaseIterable, Identifiable {
 
     var id: Self { self }
 
+    var name: LocalizedStringKey {
+        switch self {
+        case .ocean: "Ocean"
+        case .fire: "Fire"
+        case .forest: "Forest"
+        case .grape: "Grape"
+        case .sunset: "Sunset"
+        case .graphite: "Graphite"
+        }
+    }
+    
     var gradient: LinearGradient {
         LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
     }

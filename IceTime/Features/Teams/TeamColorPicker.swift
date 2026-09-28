@@ -44,7 +44,7 @@ struct TeamColorPicker: View {
                                 }
                             }
                     }
-                    .accessibilityLabel(color.rawValue.capitalized)
+                    .accessibilityLabel(color.name)
                 }
             }
         }

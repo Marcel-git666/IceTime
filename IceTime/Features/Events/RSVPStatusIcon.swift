@@ -15,7 +15,7 @@ struct RSVPStatusIcon: View {
         Image(systemName: symbol)
             .font(.title2)
             .foregroundStyle(color)
-            .accessibilityLabel(status?.label ?? "No answer")
+            .accessibilityLabel(status?.label ?? String(localized: "No answer"))
     }
 
     private var symbol: String {

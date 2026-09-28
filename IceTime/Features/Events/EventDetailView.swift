@@ -65,7 +65,7 @@ struct EventDetailView: View {
 
     /// Fills in the parameters every lineup section shares.
     private func section(
-        _ title: String,
+        _ title: LocalizedStringKey,
         players: [Player],
         isSubstitute: Bool = false,
         showsWhenEmpty: Bool = false

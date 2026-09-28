@@ -53,12 +53,12 @@ struct EventsSection: View {
 
     private func lineupSummary(for event: Event) -> String {
         let lineup = eventsViewModel.lineup(for: event, roster: rosterViewModel.players)
-        let goalies = "Goalies \(lineup.goalies.count)/\(event.goalieLimit)"
-        let skaters = "Skaters \(lineup.skaters.count)/\(event.skaterLimit)"
+        let goalies = String(localized: "Goalies \(lineup.goalies.count)/\(event.goalieLimit)")
+        let skaters = String(localized: "Skaters \(lineup.skaters.count)/\(event.skaterLimit)")
         var summary = "\(goalies) · \(skaters)"
         let subs = lineup.goalieSubs.count + lineup.skaterSubs.count
         if subs > 0 {
-            summary += " · \(subs) subs"
+            summary += " · " + String(localized: "\(subs) subs")
         }
         return summary
     }

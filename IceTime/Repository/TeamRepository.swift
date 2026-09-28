@@ -58,13 +58,13 @@ enum RepositoryError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .iCloudUnavailable:
-            return "Sign into iCloud in Settings to use IceTime."
+            return String(localized: "Sign into iCloud in Settings to use IceTime.")
         case .malformedRecord(let detail):
-            return "Unexpected data from server: \(detail)"
+            return String(localized: "Unexpected data from server: \(detail)")
         case .teamNotFound:
-            return "This team could not be found."
+            return String(localized: "This team could not be found.")
         case .notOwner:
-            return "Only the team owner can do this."
+            return String(localized: "Only the team owner can do this.")
         }
     }
 }

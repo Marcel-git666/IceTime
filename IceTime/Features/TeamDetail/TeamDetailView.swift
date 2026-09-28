@@ -53,7 +53,7 @@ struct TeamDetailView: View {
             ToolbarItem(placement: .status) {
                 Picker("Section", selection: $selectedSection) {
                     ForEach(TeamSection.allCases) { section in
-                        Text(section.rawValue).tag(section)
+                        Text(section.title).tag(section)
                     }
                 }
                 .pickerStyle(.segmented)
